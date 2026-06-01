@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
+import { theme } from "../theme/theme";
 interface AlertComponentProps {
   alert: string;
   recommendation: string;
@@ -11,11 +13,13 @@ export default function AlertComponent({
   return (
     <View style={styles.alertContainer}>
       <View style={styles.alertCard}>
+        <Ionicons style={styles.alertIcon} name="warning" size={30} color={theme.colors.errorText} />
         <Text style={styles.alertTitle}>Alert</Text>
         <Text style={styles.alertText}>{alert}</Text>
       </View>
       <View style={styles.recomCard}>
-        <Text style={styles.recomTitle}>Recommendations</Text>
+        <Ionicons style={styles.recomIcon} name="bulb" size={30} color={theme.colors.surface} />
+        <Text style={styles.recomTitle}>Action</Text>
         <Text style={styles.recomText}>{recommendation}</Text>
       </View>
     </View>
@@ -23,44 +27,60 @@ export default function AlertComponent({
 }
 
 const styles = StyleSheet.create({
+  alertContainer: {
+    // backgroundColor: theme.colors.secondary,
+    padding: 8,
+    borderRadius: 16,
+    marginBottom: -10,
+  },
+
   alertCard: {
-    backgroundColor: "#ffdad6",
+    backgroundColor: theme.colors.errorBackground,
     padding: 20,
     borderRadius: 16,
-    marginTop: 12,
+    // marginBottom: -12,
+  },
+  alertIcon: {
+    position: "absolute",
+    top: 13,
+    left: 20,
   },
   alertTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#93000a",
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: theme.colors.errorText,
+    marginBottom: 10,
+    marginLeft: 35,
   },
 
   alertText: {
-    color: "#93000a",
+    color: theme.colors.errorText,
     fontSize: 16,
   },
 
   recomCard: {
-    backgroundColor: "#e9e9d2",
+    backgroundColor: theme.colors.successBackground,
     padding: 20,
-    borderRadius: 16,
-    marginTop: 12,
+    // borderRadius: 16,
+    position: "relative",
+    top: -15,
+  },
+  recomIcon: {
+    position: "absolute",
+    top: 13,
+    left: 20,
+    color: theme.colors.warning,
   },
   recomTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#02c629",
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: theme.colors.successText,
+    marginBottom: 10,
+    marginLeft: 35,
   },
   recomText: {
-    color: "#25cf18",
+    color: theme.colors.successText,
     fontSize: 16,
   },
-  alertContainer: {
-    backgroundColor: "#9acca4",
-    padding: 8,
-    borderRadius: 16,
-    marginBottom: 10,
-  },
+
 });
