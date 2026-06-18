@@ -1,24 +1,27 @@
 import { predictWaterQuality } from "@/src/ai/waterQualityPredictor";
-import AlertComponent from "@/src/components/AlertComponent";
+import AlertCenter from "@/src/components/AlertCenter";
 import { sensorData } from "@/src/data/sensorData";
 import { theme } from "@/src/theme/theme";
 import React from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 export default function AlertsScreen() {
   const data = sensorData;
-  const res = predictWaterQuality(data);
+  const predictions = predictWaterQuality(data);
+
+  const sortedAlerts = [...predictions].sort((a, b) => {
+    const order = {
+      high: 3,
+      medium: 2,
+      low: 1,
+    };
+
+    return order[b.severity] - order[a.severity];
+  });
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.text}>Alerts & Recommendations</Text>
-      {res.map((r, i) => (
-        <AlertComponent
-          key={i}
-          recommendation={r.recommendations}
-          alert={r.alert}
-        />
-      ))}
+      <AlertCenter alerts={sortedAlerts} />
     </ScrollView>
   );
 }

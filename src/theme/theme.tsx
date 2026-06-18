@@ -5,7 +5,7 @@ export const theme = {
     tertiary: '#6d0001',
     background: '#003657',
     surface: '#ffffff',
-    text: '#ffffff', //#1a1c1e
+    text: '#e5eaec', //#1a1c1e
     errorText: '#ba1a1a',
     errorBackground: '#ffdad6',
     successText: '#055c00',
