@@ -14,6 +14,7 @@ interface Props {
 
   isActive: boolean;
   onToggle: (value: boolean) => void;
+  onDelete: () => void;
   isCompleted?: boolean;
   completedAt?: string;
   onComplete: () => void;
@@ -28,6 +29,7 @@ export default function FeedingScheduleCard({
   repeatDays,
   isActive,
   onToggle,
+  onDelete,
   isCompleted,
   completedAt,
   onComplete
@@ -123,7 +125,9 @@ export default function FeedingScheduleCard({
             />
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={onDelete}
+          >
             <Ionicons
               name="trash-outline"
               size={20}

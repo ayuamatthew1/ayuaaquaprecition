@@ -65,9 +65,10 @@ export default function FeedingScheduleScreen() {
   const handleSaveSchedule = async (
     newSchedule: any
   ) => {
+
     const notificationId =
       await scheduleFeedingNotification({
-        pond: newSchedule.pond.name,
+        pond: ponds.find((p) => p.id === newSchedule.pondId)?.name || "Unknown Pond",
         feedType: newSchedule.feedType,
         quantity: newSchedule.quantity,
         unit: newSchedule.unit,
@@ -132,6 +133,13 @@ export default function FeedingScheduleScreen() {
     );
   };
 
+  // delete a schedule
+  const deleteSchedule = async (scheduleId: string) => {
+    const schedule = schedules.find((s) => s.id === scheduleId);
+    if (!schedule) return;
+
+    setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+  };
 
   return (
     <View style={styles.container}>
@@ -159,9 +167,10 @@ export default function FeedingScheduleScreen() {
             isCompleted={schedule.isCompleted}
             completedAt={schedule.completedAt}
             onComplete={() => markAsCompleted(schedule.id)}
+            onDelete={() => deleteSchedule(schedule.id)}
             pondName={ponds.find((p) => p.id === schedule.pondId)?.name || "Unknown Pond"}
             species={ponds.find((p) => p.id === schedule.pondId)?.species || "Unknown Species"}
-          />  
+          />
         ))}
       </ScrollView>
       <AddScheduleModal
