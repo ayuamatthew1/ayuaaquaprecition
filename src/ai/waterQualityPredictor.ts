@@ -1,78 +1,55 @@
-
-interface dataType {
-    temperature: number;
-    ph: number;
-    dissolvedOxygen:number;
-    turbidity: number;
-    ammonia: number;
-    timestamp: Date;
-}
-
-interface PredictionResult {
-  alert: string;
-  recommendations: string;
-  severity: "low" | "medium" | "high";
-}
-
+import { SensorReading } from "../types/sensorReading";
+import { WaterQualityAlert } from "../types/waterQualityAlert";
 
 export function predictWaterQuality(
-  data: dataType
-): PredictionResult[] {
-  const alertAndRecomm: PredictionResult[] = [];
+  data: SensorReading
+): WaterQualityAlert[] {
+  const alerts: WaterQualityAlert[] = [];
 
   if (data.temperature > 30) {
-    alertAndRecomm.push({
-      alert: "High water temperature detected",
-      recommendations:
+    alerts.push({
+      alert: "High Water Temperature",
+      recommendation:
         "Increase aeration and reduce sunlight exposure.",
-      severity: "medium",
+      severity: "MEDIUM",
     });
   }
 
   if (data.ph < 6.5 || data.ph > 8.5) {
-    alertAndRecomm.push({
-      alert: "Unsafe pH level detected",
-      recommendations:
-        "Adjust pH gradually using approved hatchery buffers.",
-      severity: "medium",
+    alerts.push({
+      alert: "Unsafe pH Level",
+      recommendation:
+        "Gradually adjust pH using approved buffers.",
+      severity: "HIGH",
     });
   }
 
   if (data.dissolvedOxygen < 5) {
-    alertAndRecomm.push({
-      alert: "Low dissolved oxygen detected",
-      recommendations:
+    alerts.push({
+      alert: "Low Dissolved Oxygen",
+      recommendation:
         "Activate aerators immediately.",
-      severity: "high",
+      severity: "HIGH",
     });
   }
 
   if (data.ammonia > 0.02) {
-    alertAndRecomm.push({
-      alert: "Dangerous ammonia concentration detected",
-      recommendations:
-        "Perform partial water exchange and reduce feeding temporarily.",
-      severity: "high",
+    alerts.push({
+      alert: "High Ammonia",
+      recommendation:
+        "Perform water exchange and reduce feeding.",
+      severity: "HIGH",
     });
   }
 
   if (data.turbidity > 25) {
-    alertAndRecomm.push({
-      alert: "High turbidity detected",
-      recommendations:
-        "Clean filters and inspect organic waste accumulation.",
-      severity: "low",
+    alerts.push({
+      alert: "High Turbidity",
+      recommendation:
+        "Inspect filters and remove waste buildup.",
+      severity: "MEDIUM",
     });
   }
 
-  if (alertAndRecomm.length === 0) {
-    alertAndRecomm.push({
-      alert: "Water quality is healthy",
-      recommendations:
-        "Continue routine monitoring.",
-      severity: "low",
-    });
-  }
-
-  return alertAndRecomm;
+  return alerts;
 }

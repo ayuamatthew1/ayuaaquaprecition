@@ -1,10 +1,9 @@
 import AddScheduleModal from "@/src/components/AddScheduleModal";
 import FeedingScheduleCard from "@/src/components/FeedingScheduleCard";
-import { FeedingHistory } from "@/src/data/feedingHistory";
-import {
-  feedingSchedules,
-} from "@/src/data/feedingSchedules";
+import { feedingSchedules } from "@/src/data/feedingSchedules";
+import { ponds } from "@/src/data/ponds";
 import { requestNotificationPermissions, scheduleFeedingNotification } from "@/src/services/notificationService";
+import { FeedingHistory } from "@/src/types/feedingHistory";
 import { Ionicons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useState } from "react";
@@ -25,30 +24,22 @@ export default function FeedingScheduleScreen() {
   const [feedingHistory, setFeedingHistory] = useState<FeedingHistory[]>([]);
 
   // Toggle schedule active/inactive
-  const toggleSchedule = async (
-    scheduleId: string,
-    value: boolean
-  ) => {
-    const schedule = schedules.find(
-      (s) => s.id === scheduleId
-    );
+  const toggleSchedule = async (scheduleId: string, value: boolean) => {
 
+    const schedule = schedules.find((s) => s.id === scheduleId);
     if (!schedule) return;
+    const pond = ponds.find((p) => p.id === schedule.pondId);
 
     let notificationId = schedule.notificationId;
 
     if (!value && notificationId) {
-      await Notifications.cancelScheduledNotificationAsync(
-        notificationId
-      );
-
-      notificationId = undefined;
+      await Notifications.cancelScheduledNotificationAsync(notificationId); notificationId = undefined;
     }
 
     if (value) {
       notificationId =
         await scheduleFeedingNotification({
-          pond: schedule.pond,
+          pond: pond?.name || "Unknown Pond",
           feedType: schedule.feedType,
           quantity: schedule.quantity,
           unit: schedule.unit,
@@ -76,7 +67,7 @@ export default function FeedingScheduleScreen() {
   ) => {
     const notificationId =
       await scheduleFeedingNotification({
-        pond: newSchedule.pond,
+        pond: newSchedule.pond.name,
         feedType: newSchedule.feedType,
         quantity: newSchedule.quantity,
         unit: newSchedule.unit,
@@ -100,15 +91,14 @@ export default function FeedingScheduleScreen() {
     requestNotificationPermissions();
   }, []);
 
+
   // mark a schedule as completed and add to history
-  const markAsCompleted = (
-    scheduleId: string
-  ) => {
-    const schedule = schedules.find(
-      (s) => s.id === scheduleId
-    );
+  const markAsCompleted = (scheduleId: string) => {
+
+    const schedule = schedules.find((s) => s.id === scheduleId);
 
     if (!schedule) return;
+    const pond = ponds.find((p) => p.id === schedule.pondId);
 
     const completionTime =
       new Date().toLocaleTimeString([], {
@@ -118,26 +108,16 @@ export default function FeedingScheduleScreen() {
 
     const historyRecord = {
       id: Date.now().toString(),
-
       scheduleId: schedule.id,
-
-      pond: schedule.pond,
-
+      pond: pond?.name || "Unknown Pond",
       feedType: schedule.feedType,
-
       quantity: schedule.quantity,
-
       unit: schedule.unit,
-
       scheduledTime: schedule.time,
-
       completedAt: completionTime,
     };
 
-    setFeedingHistory((prev) => [
-      historyRecord,
-      ...prev,
-    ]);
+    setFeedingHistory((prev) => [historyRecord, ...prev,]);
 
     setSchedules((prev) =>
       prev.map((item) =>
@@ -175,15 +155,13 @@ export default function FeedingScheduleScreen() {
             time={schedule.time}
             repeatDays={schedule.repeatDays}
             isActive={schedule.isActive}
-            onToggle={(value) =>
-              toggleSchedule(schedule.id, value)
-            }
+            onToggle={(value) => toggleSchedule(schedule.id, value)}
             isCompleted={schedule.isCompleted}
             completedAt={schedule.completedAt}
-            onComplete={() =>
-              markAsCompleted(schedule.id)
-            }
-          />
+            onComplete={() => markAsCompleted(schedule.id)}
+            pondName={ponds.find((p) => p.id === schedule.pondId)?.name || "Unknown Pond"}
+            species={ponds.find((p) => p.id === schedule.pondId)?.species || "Unknown Species"}
+          />  
         ))}
       </ScrollView>
       <AddScheduleModal

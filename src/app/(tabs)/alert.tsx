@@ -11,9 +11,9 @@ export default function AlertsScreen() {
 
   const sortedAlerts = [...predictions].sort((a, b) => {
     const order = {
-      high: 3,
-      medium: 2,
-      low: 1,
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
     };
 
     return order[b.severity] - order[a.severity];

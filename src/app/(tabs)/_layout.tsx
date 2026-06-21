@@ -49,11 +49,11 @@ export default function TabsLayout() {
             />
 
             <Tabs.Screen
-                name="inventory"
+                name="ponds"
                 options={{
-                    title: 'Inventory',
+                    title: 'Ponds',
                     tabBarIcon: ({ size, color }) => <Ionicons
-                        name="cube-outline"
+                        name="water-outline"
                         size={size} color={color} />
                 }}
             />

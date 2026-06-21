@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { theme } from "../theme/theme";
 
-type Severity = "low" | "medium" | "high";
+type Severity = "LOW" | "MEDIUM" | "HIGH";
 
 interface AlertItemProps {
   alert: string;
@@ -12,17 +12,17 @@ interface AlertItemProps {
 }
 
 const severityConfig = {
-  low: {
+  LOW: {
     color: "#4CAF50",
     icon: "checkmark-circle",
     label: "Low",
   },
-  medium: {
+  MEDIUM: {
     color: "#FFC107",
     icon: "warning",
     label: "Medium",
   },
-  high: {
+  HIGH: {
     color: "#F44336",
     icon: "alert-circle",
     label: "High",

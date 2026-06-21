@@ -1,35 +1,9 @@
-export interface FeedingSchedule {
-  id: string;
-
-  pond: string;
-
-  feedType: string;
-
-  quantity: number;
-
-  unit: string;
-
-  time: string;
-
-  hour: number;
-
-  minute: number;
-
-  repeatDays: string[];
-
-  isActive: boolean;
-
-  notificationId?: string;
-
-  isCompleted?: boolean;
-
-  completedAt?: string;
-}
+import { FeedingSchedule } from "../types/feedingSchedule";
 
 export const feedingSchedules: FeedingSchedule[] = [
   {
     id: "1",
-    pond: "Pond 1",
+    pondId: "1",
     feedType: "Floating Feed",
     quantity: 2,
     unit: "kg",
@@ -50,7 +24,7 @@ export const feedingSchedules: FeedingSchedule[] = [
 
   {
     id: "2",
-    pond: "Pond 2",
+    pondId: "2",
     feedType: "Floating Feed",
     quantity: 1,
     unit: "kg",
@@ -69,7 +43,7 @@ export const feedingSchedules: FeedingSchedule[] = [
 
   {
     id: "3",
-    pond: "Pond 3",
+    pondId: "3",
     feedType: "Sinking Feed",
     quantity: 2,
     unit: "kg",

@@ -8,6 +8,8 @@ interface Props {
   quantity: number;
   unit: string;
   time: string;
+  pondName: string;
+  species: string;
   repeatDays: string[];
 
   isActive: boolean;
@@ -21,6 +23,8 @@ export default function FeedingScheduleCard({
   quantity,
   unit,
   time,
+  pondName,
+  species,
   repeatDays,
   isActive,
   onToggle,
@@ -41,6 +45,14 @@ export default function FeedingScheduleCard({
           {time}
         </Text>
       </View>
+
+      <Text style={styles.pondName}>
+        {pondName || "Unknown Pond"}
+      </Text>
+
+      <Text style={styles.species}>
+        {species || "Unknown Species"}
+      </Text>
 
       <Text style={styles.feedType}>
         {feedType}
@@ -206,5 +218,16 @@ const styles = StyleSheet.create({
 
   completedTime: {
     color: "#ccc",
+  },
+
+  pondName: {
+    color: theme.colors.surface,
+    fontWeight: "700",
+    marginTop: 8,
+  },
+
+  species: {
+    color: "#aaa",
+    marginBottom: 8,
   },
 });

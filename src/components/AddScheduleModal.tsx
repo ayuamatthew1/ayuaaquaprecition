@@ -1,3 +1,6 @@
+import { ponds } from "@/src/data/ponds";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
   Modal,
@@ -8,8 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { theme } from "../theme/theme";
 
 const DAYS = [
@@ -26,7 +27,7 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   onSave: (schedule: {
-    pond: string;
+    pondId: string;
     feedType: string;
     quantity: number;
     unit: string;
@@ -46,7 +47,7 @@ export default function AddScheduleModal({
   const [feedType, setFeedType] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit] = useState("kg");
-
+  const [pondId, setPondId] = useState(ponds[0]?.id || "");
   const [selectedDays, setSelectedDays] =
     useState<string[]>([]);
 
@@ -72,20 +73,13 @@ export default function AddScheduleModal({
     });
 
     onSave({
-      pond: "Pond 1",
-
+      pondId,
       feedType,
-
       quantity: Number(quantity),
-
       unit,
-
       time: formattedTime,
-
       hour: time.getHours(),
-
       minute: time.getMinutes(),
-
       repeatDays: selectedDays,
     });
 
@@ -110,6 +104,27 @@ export default function AddScheduleModal({
             onChangeText={setFeedType}
             style={styles.input}
           />
+
+          <Text style={styles.sectionTitle}>
+            Select Pond
+          </Text>
+
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={pondId}
+              onValueChange={(itemValue) =>
+                setPondId(itemValue)
+              }
+            >
+              {ponds.map((item) => (
+                <Picker.Item
+                  key={item.id}
+                  label={item.name}
+                  value={item.id}
+                />
+              ))}
+            </Picker>
+          </View>
 
           <TextInput
             placeholder="Quantity"
@@ -249,6 +264,12 @@ const styles = StyleSheet.create({
     color: theme.colors.surface,
     fontWeight: "700",
     marginBottom: 10,
+  },
+
+  pickerContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginBottom: 12,
   },
 
   daysContainer: {

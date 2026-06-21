@@ -1,8 +1,4 @@
-export interface WaterQualityResult {
-  score: number;
-  status: "Excellent" | "Good" | "Warning" | "Critical";
-  color: string;
-}
+import { WaterQualityResult } from "@/src/types/waterQualityResult";
 
 export function calculateWaterQuality(data: {
   temperature: number;
@@ -11,6 +7,7 @@ export function calculateWaterQuality(data: {
   turbidity: number;
   ph: number;
 }): WaterQualityResult {
+
   let score = 100;
 
   // Temperature
@@ -44,7 +41,7 @@ export function calculateWaterQuality(data: {
     return {
       score,
       status: "Excellent",
-      color: "#4CAF50",
+      color: "#1eeb25",
     };
   }
 
@@ -52,7 +49,7 @@ export function calculateWaterQuality(data: {
     return {
       score,
       status: "Good",
-      color: "#8BC34A",
+      color: "#1ccc22",
     };
   }
 

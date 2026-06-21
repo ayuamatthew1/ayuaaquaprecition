@@ -15,17 +15,16 @@ export default function DashboardScreen() {
 
   const waterQuality = calculateWaterQuality(data);
 
-  // const res = predictWaterQuality(data);
 
   // PREDICTION LOGIC
   const predictions = predictWaterQuality(data);
 
   const riskLevel = predictions.some(
-    (p) => p.severity === "high"
+    (p) => p.severity === "HIGH"
   )
     ? "High"
     : predictions.some(
-      (p) => p.severity === "medium"
+      (p) => p.severity === "MEDIUM"
     )
       ? "Medium"
       : "Low";
@@ -96,7 +95,7 @@ export default function DashboardScreen() {
         <AIRiskAnalysisCard
           riskLevel={riskLevel}
           alertCount={predictions.length}
-          recommendation={predictions[0].recommendations}
+          recommendation={predictions[0].recommendation}
         />
       </View>
 
