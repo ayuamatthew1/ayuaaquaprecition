@@ -5,4 +5,6 @@ export interface Device {
   status: "ONLINE" | "OFFLINE";
   lastSeen: Date;
   firmwareVersion: string;
+  batteryLevel: number;
+  signalStrength: "WEAK" | "FAIR" | "GOOD" | "STRONG";
 }

@@ -7,6 +7,8 @@ export const devices: Device[] = [
     pondId: "pond-1",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
+    batteryLevel: 85,
+    signalStrength: "GOOD",
     lastSeen: new Date(),
   },
 
@@ -16,6 +18,8 @@ export const devices: Device[] = [
     pondId: "pond-2",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
+    batteryLevel: 90,
+    signalStrength: "STRONG",
     lastSeen: new Date(),
   },
   {
@@ -24,6 +28,8 @@ export const devices: Device[] = [
     pondId: "pond-3",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
+    batteryLevel: 75,
+    signalStrength: "FAIR",
     lastSeen: new Date(),
   },
   {
@@ -32,6 +38,8 @@ export const devices: Device[] = [
     pondId: "pond-4",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
+    batteryLevel: 80,
+    signalStrength: "GOOD",
     lastSeen: new Date(),
   },
 ];

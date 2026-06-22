@@ -1,5 +1,6 @@
 import { predictWaterQuality } from "@/src/ai/waterQualityPredictor";
 import WaterQualityChart from "@/src/components/WaterQualityChart";
+import { recentAlerts } from "@/src/data/alerts";
 import { devices } from "@/src/data/device";
 import { feedingSchedules } from "@/src/data/feedingSchedules";
 import { ponds } from "@/src/data/ponds";
@@ -129,6 +130,29 @@ export default function PondDetailsScreen() {
     },
   };
 
+  const deviceHealth = device?.status === "ONLINE"
+    ? Math.round(
+      (device.batteryLevel +
+        (device.signalStrength === "STRONG"
+          ? 100
+          : device.signalStrength === "GOOD"
+            ? 80
+            : device.signalStrength === "FAIR"
+              ? 60
+              : 40)) / 2
+    ) : 0;
+
+  const pondAlerts = recentAlerts.filter(
+    (alert) => alert.pondId === pond.id
+  );
+
+  const batteryColor =
+    device?.batteryLevel! >= 70
+      ? "#4CAF50"
+      : device?.batteryLevel! >= 40
+        ? "#FFC107"
+        : "#F44336";
+
   return (
     <ScrollView
       style={styles.container}
@@ -191,8 +215,8 @@ export default function PondDetailsScreen() {
       <Text style={styles.sectionHeading}>
         Device Information
       </Text>
-
       <View style={styles.deviceCard}>
+
         <View style={styles.deviceRow}>
           <Text style={styles.deviceLabel}>
             Serial Number
@@ -209,17 +233,40 @@ export default function PondDetailsScreen() {
           </Text>
 
           <Text
-            style={[
-              styles.deviceValue,
-              {
-                color:
-                  device?.status === "ONLINE"
-                    ? "#1eeb25"
-                    : "#F44336",
-              },
-            ]}
+            style={{
+              color:
+                device?.status === "ONLINE"
+                  ? "#4CAF50"
+                  : "#F44336",
+              fontWeight: "700",
+            }}
           >
             {device?.status}
+          </Text>
+        </View>
+
+        <View style={styles.deviceRow}>
+          <Text style={styles.deviceLabel}>
+            Battery
+          </Text>
+
+          <Text
+            style={{
+              color: batteryColor,
+              fontWeight: "700",
+            }}
+          >
+            {device?.batteryLevel}%
+          </Text>
+        </View>
+
+        <View style={styles.deviceRow}>
+          <Text style={styles.deviceLabel}>
+            Signal
+          </Text>
+
+          <Text style={styles.deviceValue}>
+            {device?.signalStrength}
           </Text>
         </View>
 
@@ -229,22 +276,31 @@ export default function PondDetailsScreen() {
           </Text>
 
           <Text style={styles.deviceValue}>
-            {device?.firmwareVersion}
+            v{device?.firmwareVersion}
           </Text>
         </View>
 
         <View style={styles.deviceRow}>
           <Text style={styles.deviceLabel}>
-            Last Seen
+            Device Health
           </Text>
 
-          <Text style={styles.deviceValue}>
-            {device?.lastSeen.toLocaleString()}
+          <Text
+            style={{
+              color:
+                deviceHealth >= 80
+                  ? "#4CAF50"
+                  : deviceHealth >= 60
+                    ? "#FFC107"
+                    : "#F44336",
+
+              fontWeight: "700",
+            }}
+          >
+            {deviceHealth}%
           </Text>
         </View>
       </View>
-
-      {/* Water Quality Score */}
 
       <View style={styles.scoreCard}>
         <Text style={styles.sectionTitle}>
@@ -711,6 +767,72 @@ export default function PondDetailsScreen() {
           </View>
         </View>
       </View>
+
+      <Text style={styles.sectionHeading}>
+        Recent Alerts
+      </Text>
+
+      {pondAlerts.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>
+            No recent alerts.
+          </Text>
+        </View>
+      ) : (
+        pondAlerts.map((alert) => (
+          <View
+            key={alert.id}
+            style={styles.alertCard}
+          >
+            <View style={styles.alertHeader}>
+              <Text
+                style={[
+                  styles.alertSeverity,
+                  {
+                    color:
+                      alert.severity === "HIGH"
+                        ? "#F44336"
+                        : alert.severity ===
+                          "MEDIUM"
+                          ? "#FFC107"
+                          : "#4CAF50",
+                  },
+                ]}
+              >
+                {alert.severity}
+              </Text>
+
+              <Text style={styles.alertDate}>
+                {alert.createdAt.toLocaleDateString()}
+              </Text>
+            </View>
+
+            <Text style={styles.alertTitle}>
+              {alert.title}
+            </Text>
+
+            <Text
+              style={styles.alertDescription}
+            >
+              {alert.description}
+            </Text>
+
+            <Text
+              style={{
+                color: alert.resolved
+                  ? "#4CAF50"
+                  : "#F44336",
+                marginTop: 10,
+                fontWeight: "700",
+              }}
+            >
+              {alert.resolved
+                ? "Resolved"
+                : "Active"}
+            </Text>
+          </View>
+        ))
+      )}
     </ScrollView>
   );
 }
@@ -1003,5 +1125,39 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginTop: 4,
+  },
+
+  alertCard: {
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+  },
+
+  alertHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  alertSeverity: {
+    fontWeight: "700",
+  },
+
+  alertDate: {
+    color: "#999",
+  },
+
+  alertTitle: {
+    color: theme.colors.surface,
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 8,
+  },
+
+  alertDescription: {
+    color: "#ccc",
+    marginTop: 6,
+    lineHeight: 22,
   },
 });
