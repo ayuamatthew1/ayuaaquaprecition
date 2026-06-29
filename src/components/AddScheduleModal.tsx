@@ -46,7 +46,7 @@ export default function AddScheduleModal({
 
   const [feedType, setFeedType] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [unit] = useState("kg");
+  const [unit, setUnit] = useState("");
   const [pondId, setPondId] = useState(ponds[0]?.id || "");
   const [selectedDays, setSelectedDays] =
     useState<string[]>([]);
@@ -126,6 +126,7 @@ export default function AddScheduleModal({
             </Picker>
           </View>
 
+          <View >
           <TextInput
             placeholder="Quantity"
             value={quantity}
@@ -133,6 +134,30 @@ export default function AddScheduleModal({
             keyboardType="numeric"
             style={styles.input}
           />
+
+            <Text style={styles.sectionTitle}>
+            Select Unit
+          </Text>
+
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={unit}
+              onValueChange={(itemValue) =>
+                setUnit(itemValue)
+              }
+            >
+              <Picker.Item
+                label={'kilograms'}
+                value={'kg'}
+              />
+              <Picker.Item
+                label={'grams'}
+                value={'g'}
+              />
+            </Picker>
+          </View>
+
+          </View>
 
           <TouchableOpacity
             style={styles.timeButton}

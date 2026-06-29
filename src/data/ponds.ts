@@ -4,7 +4,7 @@ import { Pond } from "@/src/types/ponds";
 export const ponds: Pond[] = [
   {
     id: "1",
-    deviceId: "device-1",
+    deviceId: "device-4",
     name: "Pond 1",
     species: "Catfish",
     fishCount: 500,
@@ -34,7 +34,7 @@ export const ponds: Pond[] = [
 
   {
     id: "4",
-    deviceId: "device-4",
+    deviceId: "device-1",
     name: "Pond 4",
     species: "Catfish",
     fishCount: 750,
