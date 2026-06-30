@@ -8,36 +8,29 @@ import {
   View,
 } from "react-native";
 
-export default function LoginScreen() {
+export default function PasswordResetScreen() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.title}>Reset Password</Text>
 
       <TextInput
         placeholder="Email"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
-      />
-
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
 
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Send Reset Link</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.registerButtonText}>Register</Text>
+
+      <TouchableOpacity onPress={() => router.push("/login")}>
+        <Text style={styles.linkText}>Back to Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -80,9 +73,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  registerButtonText: {
+  linkText: {
     color: "#3600e9",
-    margin: 10,
-    fontSize: 16,
+    marginTop: 16,
+    textAlign: "center",
   },
 });

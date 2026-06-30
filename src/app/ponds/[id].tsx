@@ -45,49 +45,52 @@ export default function PondDetailsScreen() {
     (d) => d.id === pond.deviceId
   );
 
-  const pondReadings = sensorReadings.filter((reading) =>
-    reading.deviceId === device?.id
-  ).sort(
-    (a, b) =>
-      a.timestamp.getTime() -
-      b.timestamp.getTime()
-  );
+  const pondReadings = sensorReadings
+    .filter((reading) => reading.deviceId === device?.id)
+    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-  const metricValues = pondReadings.map(
-    (reading) => reading[selectedMetric]
-  );
+  const hasReadings = pondReadings.length > 0;
+
+  const metricValues = hasReadings
+    ? pondReadings.map((reading) => reading[selectedMetric])
+    : [];
 
   const average =
-    metricValues.reduce(
-      (sum, value) => sum + value,
-      0
-    ) / metricValues.length;
+    metricValues.length > 0
+      ? metricValues.reduce((sum, value) => sum + value, 0) /
+      metricValues.length
+      : 0;
 
-  const highest = Math.max(...metricValues);
+  const highest =
+    metricValues.length > 0 ? Math.max(...metricValues) : 0;
 
-  const lowest = Math.min(...metricValues);
+  const lowest =
+    metricValues.length > 0 ? Math.min(...metricValues) : 0;
 
-  const firstValue = metricValues[0];
-  const lastValue =
-    metricValues[metricValues.length - 1];
+  const firstValue = metricValues[0] ?? 0;
+  const lastValue = metricValues[metricValues.length - 1] ?? 0;
 
-  let trend = "Stable";
-  let trendIcon = "→";
+  let trend = "No Data";
+  let trendIcon = "–";
 
-  if (lastValue > firstValue) {
-    trend = "Increasing";
-    trendIcon = "↑";
+  if (metricValues.length > 0) {
+    trend = "Stable";
+    trendIcon = "→";
+
+    if (lastValue > firstValue) {
+      trend = "Increasing";
+      trendIcon = "↑";
+    }
+
+    if (lastValue < firstValue) {
+      trend = "Decreasing";
+      trendIcon = "↓";
+    }
   }
 
-  if (lastValue < firstValue) {
-    trend = "Decreasing";
-    trendIcon = "↓";
-  }
-
-  const sensor =
-    pondReadings[
-    pondReadings.length - 1
-    ];
+  const sensor = hasReadings
+    ? pondReadings[pondReadings.length - 1]
+    : undefined;
 
   const pondSchedules = feedingSchedules.filter(
     (schedule) => schedule.pondId === pond.id
@@ -95,13 +98,15 @@ export default function PondDetailsScreen() {
 
   const alerts = sensor ? predictWaterQuality(sensor) : [];
 
-  const waterQualityScore = calculateWaterQuality({
-    temperature: sensor?.temperature ?? 0,
-    dissolvedOxygen: sensor?.dissolvedOxygen ?? 0,
-    ammonia: sensor?.ammonia ?? 0,
-    turbidity: sensor?.turbidity ?? 0,
-    ph: sensor?.ph ?? 0,
-  });
+  const waterQualityScore = sensor
+    ? calculateWaterQuality({
+      temperature: sensor.temperature,
+      dissolvedOxygen: sensor.dissolvedOxygen,
+      ammonia: sensor.ammonia,
+      turbidity: sensor.turbidity,
+      ph: sensor.ph,
+    })
+    : { score: 0, status: "Critical", color: "#F44336" };
 
   const metricConfig = {
     temperature: {
@@ -308,134 +313,141 @@ export default function PondDetailsScreen() {
         </Text>
 
         <Text style={[styles.score, { color: waterQualityScore.color }]}>
-          {waterQualityScore.score}%
+          {sensor ? `${waterQualityScore.score}%` : "--"}
         </Text>
 
         <Text style={[styles.scoreStatus, { color: waterQualityScore.color }]}>
-          {waterQualityScore.score >= 90 ? "Excellent" :
-            waterQualityScore.score >= 70 ? "Good" :
-              waterQualityScore.score >= 50 ? "Warning" : "Critical"
-          }
+          {sensor
+            ? waterQualityScore.score >= 90
+              ? "Excellent"
+              : waterQualityScore.score >= 70
+                ? "Good"
+                : waterQualityScore.score >= 50
+                  ? "Warning"
+                  : "Critical"
+            : "No Data"}
         </Text>
       </View>
-
-      {/* Water Parameters */}
 
       <Text style={styles.sectionHeading}>
         Current Water Parameters
       </Text>
 
-      {/* Temperature */}
-
-      <View style={styles.metricCard}>
-        <Ionicons
-          name="thermometer"
-          size={24}
-          color={theme.colors.surface}
-        />
-
-        <Text style={styles.metricTitle}>
-          Temperature
-        </Text>
-
-        <Text style={styles.metricValue}>
-          {sensor?.temperature} °C
-        </Text>
-      </View>
-
-      {/* Row 1 */}
-
-      <View style={styles.metricRow}>
-        <View
-          style={[
-            styles.metricCard,
-            { flex: 1 },
-          ]}
-        >
-          <Ionicons
-            name="water"
-            size={24}
-            color={theme.colors.surface}
-          />
-
-          <Text style={styles.metricTitle}>
-            Dissolved Oxygen
-          </Text>
-
-          <Text style={styles.metricValue}>
-            {sensor?.dissolvedOxygen} mg/L
+      {!sensor ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>
+            No current sensor readings are available for this pond.
           </Text>
         </View>
+      ) : (
+        <>
+          <View style={styles.metricCard}>
+            <Ionicons
+              name="thermometer"
+              size={24}
+              color={theme.colors.surface}
+            />
 
-        <View
-          style={[
-            styles.metricCard,
-            { flex: 1 },
-          ]}
-        >
-          <Ionicons
-            name="flask"
-            size={24}
-            color={theme.colors.surface}
-          />
+            <Text style={styles.metricTitle}>
+              Temperature
+            </Text>
 
-          <Text style={styles.metricTitle}>
-            pH Level
-          </Text>
+            <Text style={styles.metricValue}>
+              {sensor.temperature} °C
+            </Text>
+          </View>
 
-          <Text style={styles.metricValue}>
-            {sensor?.ph}
-          </Text>
-        </View>
-      </View>
+          <View style={styles.metricRow}>
+            <View
+              style={[
+                styles.metricCard,
+                { flex: 1 },
+              ]}
+            >
+              <Ionicons
+                name="water"
+                size={24}
+                color={theme.colors.surface}
+              />
 
-      {/* Row 2 */}
+              <Text style={styles.metricTitle}>
+                Dissolved Oxygen
+              </Text>
 
-      <View style={styles.metricRow}>
-        <View
-          style={[
-            styles.metricCard,
-            { flex: 1 },
-          ]}
-        >
-          <Ionicons
-            name="color-filter"
-            size={24}
-            color={theme.colors.surface}
-          />
+              <Text style={styles.metricValue}>
+                {sensor.dissolvedOxygen} mg/L
+              </Text>
+            </View>
 
-          <Text style={styles.metricTitle}>
-            Turbidity
-          </Text>
+            <View
+              style={[
+                styles.metricCard,
+                { flex: 1 },
+              ]}
+            >
+              <Ionicons
+                name="flask"
+                size={24}
+                color={theme.colors.surface}
+              />
 
-          <Text style={styles.metricValue}>
-            {sensor?.turbidity} NTU
-          </Text>
-        </View>
+              <Text style={styles.metricTitle}>
+                pH Level
+              </Text>
 
-        <View
-          style={[
-            styles.metricCard,
-            { flex: 1 },
-          ]}
-        >
-          <Ionicons
-            name="bar-chart"
-            size={24}
-            color={theme.colors.surface}
-          />
+              <Text style={styles.metricValue}>
+                {sensor.ph}
+              </Text>
+            </View>
+          </View>
 
-          <Text style={styles.metricTitle}>
-            Ammonia
-          </Text>
+          <View style={styles.metricRow}>
+            <View
+              style={[
+                styles.metricCard,
+                { flex: 1 },
+              ]}
+            >
+              <Ionicons
+                name="color-filter"
+                size={24}
+                color={theme.colors.surface}
+              />
 
-          <Text style={styles.metricValue}>
-            {sensor?.ammonia} mg/L
-          </Text>
-        </View>
-      </View>
+              <Text style={styles.metricTitle}>
+                Turbidity
+              </Text>
 
-      <View style={{ height: 40 }} />
+              <Text style={styles.metricValue}>
+                {sensor.turbidity} NTU
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.metricCard,
+                { flex: 1 },
+              ]}
+            >
+              <Ionicons
+                name="bar-chart"
+                size={24}
+                color={theme.colors.surface}
+              />
+
+              <Text style={styles.metricTitle}>
+                Ammonia
+              </Text>
+
+              <Text style={styles.metricValue}>
+                {sensor.ammonia} mg/L
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ height: 40 }} />
+        </>
+      )}
 
       <Text style={styles.sectionHeading}>
         Today's Feeding Schedule
@@ -682,18 +694,20 @@ export default function PondDetailsScreen() {
         </TouchableOpacity>
       </View>
 
-      <WaterQualityChart
-        title={
-          metricConfig[selectedMetric]
-            .title
-        }
-        readings={pondReadings}
-        metric={selectedMetric}
-        unit={
-          metricConfig[selectedMetric]
-            .unit
-        }
-      />
+      {hasReadings ? (
+        <WaterQualityChart
+          title={metricConfig[selectedMetric].title}
+          readings={pondReadings}
+          metric={selectedMetric}
+          unit={metricConfig[selectedMetric].unit}
+        />
+      ) : (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>
+            No trend data available for this pond yet.
+          </Text>
+        </View>
+      )}
 
       <View style={styles.analyticsCard}>
         <Text style={styles.analyticsTitle}>

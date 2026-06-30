@@ -4,7 +4,7 @@ export const devices: Device[] = [
   {
     id: "device-1",
     serialNumber: "AQP-0001",
-    pondId: "pond-1",
+    pondId: "1",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
     batteryLevel: 85,
@@ -15,7 +15,7 @@ export const devices: Device[] = [
   {
     id: "device-2",
     serialNumber: "AQP-0002",
-    pondId: "pond-2",
+    pondId: "2",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
     batteryLevel: 90,
@@ -25,7 +25,7 @@ export const devices: Device[] = [
   {
     id: "device-3",
     serialNumber: "AQP-0003",
-    pondId: "pond-3",
+    pondId: "3",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
     batteryLevel: 75,
@@ -35,7 +35,7 @@ export const devices: Device[] = [
   {
     id: "device-4",
     serialNumber: "AQP-0004",
-    pondId: "pond-4",
+    pondId: "4",
     status: "ONLINE",
     firmwareVersion: "1.0.0",
     batteryLevel: 80,
