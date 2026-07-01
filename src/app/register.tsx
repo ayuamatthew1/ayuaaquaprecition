@@ -8,21 +8,22 @@ import {
   View,
 } from "react-native";
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.title}>Create an Account</Text>
 
       <TextInput
         placeholder="Email"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
 
       <TextInput
@@ -34,10 +35,11 @@ export default function LoginScreen() {
       />
 
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.registerButtonText}>Register</Text>
+
+      <TouchableOpacity onPress={() => router.push("/login")}>
+        <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -80,9 +82,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  registerButtonText: {
+  linkText: {
     color: "#3600e9",
-    margin: 10,
-    fontSize: 16,
+    marginTop: 16,
+    textAlign: "center",
   },
 });

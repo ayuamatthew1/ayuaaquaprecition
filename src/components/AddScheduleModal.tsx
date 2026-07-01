@@ -3,12 +3,16 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { theme } from "../theme/theme";
@@ -92,156 +96,168 @@ export default function AddScheduleModal({
       animationType="slide"
       transparent
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <Text style={styles.title}>
-            Add Feeding Schedule
-          </Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.overlay}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.centeredView}>
+            <View style={styles.container}>
+              <Text style={styles.title}>
+                Add Feeding Schedule
+              </Text>
 
-          <TextInput
-            placeholder="Feed Type"
-            value={feedType}
-            onChangeText={setFeedType}
-            style={styles.input}
-          />
-
-          <Text style={styles.sectionTitle}>
-            Select Pond
-          </Text>
-
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={pondId}
-              onValueChange={(itemValue) =>
-                setPondId(itemValue)
-              }
-            >
-              {ponds.map((item) => (
-                <Picker.Item
-                  key={item.id}
-                  label={item.name}
-                  value={item.id}
-                />
-              ))}
-            </Picker>
-          </View>
-
-          <View >
-          <TextInput
-            placeholder="Quantity"
-            value={quantity}
-            onChangeText={setQuantity}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-
-            <Text style={styles.sectionTitle}>
-            Select Unit
-          </Text>
-
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={unit}
-              onValueChange={(itemValue) =>
-                setUnit(itemValue)
-              }
-            >
-              <Picker.Item
-                label={'kilograms'}
-                value={'kg'}
-              />
-              <Picker.Item
-                label={'grams'}
-                value={'g'}
-              />
-            </Picker>
-          </View>
-
-          </View>
-
-          <TouchableOpacity
-            style={styles.timeButton}
-            onPress={() => setShowPicker(true)}
-          >
-            <Text style={styles.timeText}>
-              Feeding Time:
-              {" "}
-              {time.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
-          </TouchableOpacity>
-
-          {showPicker && (
-            <DateTimePicker
-              value={time}
-              mode="time"
-              is24Hour={false}
-              display={
-                Platform.OS === "ios"
-                  ? "spinner"
-                  : "default"
-              }
-              onChange={(event, selected) => {
-                setShowPicker(false);
-
-                if (selected) {
-                  setTime(selected);
-                }
-              }}
-            />
-          )}
-
-          <Text style={styles.sectionTitle}>
-            Repeat Days
-          </Text>
-
-          <View style={styles.daysContainer}>
-            {DAYS.map((day) => (
-              <TouchableOpacity
-                key={day}
-                style={[
-                  styles.dayChip,
-                  selectedDays.includes(day) &&
-                  styles.selectedDay,
-                ]}
-                onPress={() => toggleDay(day)}
+              <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
               >
-                <Text
-                  style={{
-                    color:
-                      selectedDays.includes(day)
-                        ? "#fff"
-                        : theme.colors.surface,
-                  }}
-                >
-                  {day}
+                <TextInput
+                  placeholder="Feed Type"
+                  value={feedType}
+                  onChangeText={setFeedType}
+                  style={styles.input}
+                />
+
+                <Text style={styles.sectionTitle}>
+                  Select Pond
                 </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
 
-          <View style={styles.buttons}>
-            <TouchableOpacity
-              onPress={onClose}
-            >
-              <Text style={styles.cancel}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={pondId}
+                    onValueChange={(itemValue) =>
+                      setPondId(itemValue)
+                    }
+                  >
+                    {ponds.map((item) => (
+                      <Picker.Item
+                        key={item.id}
+                        label={item.name}
+                        value={item.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
 
-            <TouchableOpacity
-              style={styles.saveBtn}
-              onPress={handleSave}
-            >
-              <Text style={styles.saveText}>
-                Save Schedule
-              </Text>
-            </TouchableOpacity>
+                <View >
+                  <TextInput
+                    placeholder="Quantity"
+                    value={quantity}
+                    onChangeText={setQuantity}
+                    keyboardType="numeric"
+                    style={styles.input}
+                  />
+
+                  <Text style={styles.sectionTitle}>
+                    Select Unit
+                  </Text>
+
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={unit}
+                      onValueChange={(itemValue) =>
+                        setUnit(itemValue)
+                      }
+                    >
+                      <Picker.Item
+                        label={'kilograms'}
+                        value={'kg'}
+                      />
+                      <Picker.Item
+                        label={'grams'}
+                        value={'g'}
+                      />
+                    </Picker>
+                  </View>
+
+                </View>
+
+                <TouchableOpacity
+                  style={styles.timeButton}
+                  onPress={() => setShowPicker(true)}
+                >
+                  <Text style={styles.timeText}>
+                    Feeding Time:
+                    {" "}
+                    {time.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                </TouchableOpacity>
+
+                {showPicker && (
+                  <DateTimePicker
+                    value={time}
+                    mode="time"
+                    is24Hour={false}
+                    display={
+                      Platform.OS === "ios"
+                        ? "spinner"
+                        : "default"
+                    }
+                    onChange={(event, selected) => {
+                      setShowPicker(false);
+
+                      if (selected) {
+                        setTime(selected);
+                      }
+                    }}
+                  />
+                )}
+
+                <Text style={styles.sectionTitle}>
+                  Repeat Days
+                </Text>
+
+                <View style={styles.daysContainer}>
+                  {DAYS.map((day) => (
+                    <TouchableOpacity
+                      key={day}
+                      style={[
+                        styles.dayChip,
+                        selectedDays.includes(day) &&
+                        styles.selectedDay,
+                      ]}
+                      onPress={() => toggleDay(day)}
+                    >
+                      <Text
+                        style={{
+                          color:
+                            selectedDays.includes(day)
+                              ? "#fff"
+                              : theme.colors.surface,
+                        }}
+                      >
+                        {day}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <View style={styles.buttons}>
+                  <TouchableOpacity
+                    onPress={onClose}
+                  >
+                    <Text style={styles.cancel}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.saveBtn}
+                    onPress={handleSave}
+                  >
+                    <Text style={styles.saveText}>
+                      Save Schedule
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
           </View>
-        </View>
-      </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -253,11 +269,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000088",
   },
 
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+
   container: {
-    margin: 20,
+    width: "100%",
+    maxHeight: "90%",
     backgroundColor: theme.colors.secondary,
     borderRadius: 20,
     padding: 20,
+  },
+
+  scrollContent: {
+    paddingBottom: 20,
   },
 
   title: {
