@@ -1,8 +1,15 @@
-import { SensorReading } from "../types/sensorReading";
 import { WaterQualityAlert } from "../types/waterQualityAlert";
 
+type WaterQualityReading = {
+  temperature: number;
+  dissolvedOxygen: number;
+  ph: number;
+  turbidity: number;
+  ammonia: number | null;
+};
+
 export function predictWaterQuality(
-  data: SensorReading
+  data: WaterQualityReading
 ): WaterQualityAlert[] {
   const alerts: WaterQualityAlert[] = [];
 
@@ -33,7 +40,7 @@ export function predictWaterQuality(
     });
   }
 
-  if (data.ammonia > 0.02) {
+  if (data.ammonia !== null && data.ammonia > 0.02) {
     alerts.push({
       alert: "High Ammonia",
       recommendation:

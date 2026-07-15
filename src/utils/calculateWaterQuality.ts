@@ -3,7 +3,7 @@ import { WaterQualityResult } from "@/src/types/waterQualityResult";
 export function calculateWaterQuality(data: {
   temperature: number;
   dissolvedOxygen: number;
-  ammonia: number;
+  ammonia: number | null;
   turbidity: number;
   ph: number;
 }): WaterQualityResult {
@@ -21,7 +21,7 @@ export function calculateWaterQuality(data: {
   }
 
   // Ammonia
-  if (data.ammonia > 0.02) {
+  if (data.ammonia !== null && data.ammonia > 0.02) {
     score -= 25;
   }
 

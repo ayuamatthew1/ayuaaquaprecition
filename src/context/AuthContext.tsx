@@ -1,7 +1,7 @@
 import { getApiUrl } from "@/src/lib/api";
 import type { AuthSession, AuthUser } from "@/src/types/auth";
 import * as SecureStore from "expo-secure-store";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 
 type AuthProviderProps = {
@@ -9,6 +9,7 @@ type AuthProviderProps = {
   isAuthenticated: boolean;
   signIn: (identifier: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  authenticatedFetch: (path: string, init?: RequestInit) => Promise<Response>;
   loading: boolean;
 };
 
@@ -95,12 +96,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
+  const authenticatedFetch = useCallback(async (path: string, init: RequestInit = {}) => {
+    const token = await getToken();
+    if (!token) throw new Error("You are not signed in.");
+
+    return fetch(getApiUrl(path), {
+      ...init,
+      headers: {
+        ...init.headers,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ user, isAuthenticated, signIn, signOut, loading }),
-    [isAuthenticated, loading, user],
+    () => ({ user, isAuthenticated, signIn, signOut, authenticatedFetch, loading }),
+    [authenticatedFetch, isAuthenticated, loading, user],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>
+    {children}
+  </AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthProviderProps => {
