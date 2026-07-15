@@ -1,0 +1,456 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String         @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String         @unique
+  username          String         @unique
+  passwordHash      String
+  phone             String         @unique
+  avatar            String?
+  role              UserRole       @default(FARMER)
+  status            UserStatus     @default(ACTIVE)
+  emailVerified     Boolean        @default(false)
+  lastLoginAt       DateTime?
+  passwordChangedAt DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+  farms             Farm[]
+  feedHistories     FeedHistory[]
+  notifications     Notification[]
+
+  @@index([email])
+  @@index([username])
+  @@index([role])
+  @@index([status])
+}
+
+model Farm {
+  id          String     @id @default(cuid())
+  ownerId     String
+  name        String
+  description String?
+  address     String?
+  city        String?
+  state       String?
+  country     String?
+  latitude    Float?
+  longitude   Float?
+  status      FarmStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  ponds        Pond[]
+  subscription Subscription?
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model Pond {
+  id                      String                   @id @default(cuid())
+  farmId                  String
+  name                    String
+  code                    String                   @unique
+  type                    PondType
+  status                  PondStatus               @default(ACTIVE)
+  length                  Float?
+  width                   Float?
+  depth                   Float?
+  capacity                Float?
+  waterVolume             Float?
+  notes                   String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  farm                    Farm                     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  device                  Device?
+  fishBatches             FishBatch[]
+  feedingSchedules        FeedingSchedule[]
+  alerts                  Alert[]
+  waterQualityPredictions WaterQualityPrediction[]
+  diseasePredictions      DiseasePrediction[]
+
+  @@index([farmId])
+  @@index([status])
+}
+
+model FishBatch {
+  id                  String    @id @default(cuid())
+  pondId              String
+  species             String
+  breed               String?
+  quantity            Int
+  averageWeight       Float?
+  source              String?
+  stockedAt           DateTime
+  expectedHarvestDate DateTime?
+  harvestedAt         DateTime?
+  notes               String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  pond                Pond      @relation(fields: [pondId], references: [id], onDelete: Cascade)
+
+  @@index([pondId])
+  @@index([stockedAt])
+}
+
+model Device {
+  id              String          @id @default(cuid())
+  pondId          String          @unique
+  name            String
+  serialNumber    String          @unique
+  firmwareVersion String?
+  hardwareVersion String?
+  macAddress      String?         @unique
+  status          DeviceStatus    @default(OFFLINE)
+  installedAt     DateTime?
+  lastSeenAt      DateTime?
+  batteryLevel    Float?
+  signalStrength  Float?
+  ipAddress       String?
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  pond            Pond            @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  sensorReadings  SensorReading[]
+
+  @@index([status])
+  @@index([lastSeenAt])
+}
+
+model SensorReading {
+  id              String   @id @default(cuid())
+  deviceId        String
+  temperature     Float
+  ph              Float
+  dissolvedOxygen Float
+  turbidity       Float
+  ammonia         Float?
+  conductivity    Float?
+  salinity        Float?
+  waterLevel      Float?
+  recordedAt      DateTime @default(now())
+  device          Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  alerts          Alert[]
+
+  @@index([deviceId])
+  @@index([recordedAt])
+  @@index([deviceId, recordedAt])
+}
+
+model FeedingSchedule {
+  id         String        @id @default(cuid())
+  pondId     String
+  feedType   FeedType
+  quantity   Float
+  unit       String
+  feedTime   DateTime
+  repeatDays String[]      @default(["DAILY"])
+  isActive   Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  pond       Pond          @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  histories  FeedHistory[]
+
+  @@index([pondId])
+  @@index([feedTime])
+}
+
+model FeedHistory {
+  id            String          @id @default(cuid())
+  scheduleId    String
+  fedAt         DateTime
+  quantity      Float
+  completedById String?
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  schedule      FeedingSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  completedBy   User?           @relation(fields: [completedById], references: [id], onDelete: SetNull)
+
+  @@index([fedAt])
+  @@index([completedById])
+}
+
+model Alert {
+  id              String         @id @default(cuid())
+  pondId          String
+  sensorReadingId String?
+  title           String
+  message         String
+  severity        AlertSeverity
+  status          AlertStatus    @default(ACTIVE)
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  pond            Pond           @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  sensorReading   SensorReading? @relation(fields: [sensorReadingId], references: [id], onDelete: SetNull)
+
+  @@index([pondId])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model WaterQualityPrediction {
+  id              String    @id @default(cuid())
+  pondId          String
+  overallScore    Float
+  riskLevel       RiskLevel
+  summary         String
+  recommendations String
+  confidence      Float?
+  generatedAt     DateTime  @default(now())
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  pond            Pond      @relation(fields: [pondId], references: [id], onDelete: Cascade)
+
+  @@index([pondId])
+  @@index([generatedAt])
+}
+
+model DiseasePrediction {
+  id             String    @id @default(cuid())
+  pondId         String
+  disease        String
+  probability    Float
+  riskLevel      RiskLevel
+  symptoms       String?
+  recommendation String
+  generatedAt    DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  pond           Pond      @relation(fields: [pondId], references: [id], onDelete: Cascade)
+
+  @@index([pondId])
+  @@index([generatedAt])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  channel   NotificationChannel
+  isRead    Boolean             @default(false)
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id           String             @id @default(cuid())
+  farmId       String             @unique
+  plan         String
+  status       SubscriptionStatus
+  billingCycle BillingCycle
+  startsAt     DateTime
+  endsAt       DateTime
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  farm         Farm               @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+// USER & AUTHENTICATION
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  TECHNICIAN
+  FARMER
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  APPLE
+}
+
+// FARM
+
+enum FarmStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+// POND
+
+enum PondType {
+  EARTHEN
+  CONCRETE
+  TARPAULIN
+  FIBER
+  PLASTIC
+}
+
+enum PondStatus {
+  ACTIVE
+  EMPTY
+  STOCKING
+  HARVESTING
+  QUARANTINE
+  MAINTENANCE
+}
+
+// DEVICE
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  DISCONNECTED
+}
+
+enum DeviceType {
+  WATER_MONITOR
+  FEEDING_CONTROLLER
+  CAMERA
+}
+
+// SENSOR
+
+enum SensorStatus {
+  NORMAL
+  WARNING
+  CRITICAL
+}
+
+enum SensorType {
+  PH
+  TEMPERATURE
+  DISSOLVED_OXYGEN
+  TURBIDITY
+  AMMONIA
+}
+
+// FEEDING
+
+enum FeedingStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
+enum FeedType {
+  STARTER
+  GROWER
+  FINISHER
+  FLOATING
+  SINKING
+  CUSTOM
+}
+
+// ALERTS
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+// AI
+
+enum PredictionType {
+  WATER_QUALITY
+  DISEASE
+  GROWTH
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// NOTIFICATIONS
+
+enum NotificationType {
+  ALERT
+  FEEDING
+  DEVICE
+  SYSTEM
+  SUBSCRIPTION
+}
+
+enum NotificationChannel {
+  IN_APP
+  PUSH
+  EMAIL
+  SMS
+}
+
+// SUBSCRIPTION
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIAL
+  EXPIRED
+  CANCELLED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+// PAYMENTS
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  PAYSTACK
+  FLUTTERWAVE
+  STRIPE
+}
+
+// AI GENERATED REPORTS
+
+enum ReportType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ayuaaquaprecition",
+    "name": "Ayua Aquaprecition",
     "slug": "ayuaaquapresitionapp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -22,11 +22,11 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
+      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
+      ["expo-router"],
       [
         "expo-splash-screen",
         {
