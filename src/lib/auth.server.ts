@@ -19,7 +19,6 @@ export function toAuthUser(user: User): AuthUser {
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
-    username: user.username,
     email: user.email,
     role: user.role,
   };

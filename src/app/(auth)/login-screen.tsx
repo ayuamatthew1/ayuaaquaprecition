@@ -79,7 +79,9 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.registerButtonText}>Register</Text>
+        <Text style={styles.registerButtonText}>
+          Don&apos;t have an account? Register
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -97,7 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "700",
     marginBottom: 24,
-    color: theme.colors.secondary,
+    color: theme.colors.primary,
   },
 
   input: {
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.primary,
     padding: 18,
     borderRadius: 14,
     alignItems: "center",
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
   },
 
   registerButtonText: {
-    color: "#3600e9",
+    color: theme.colors.primary,
     margin: 10,
     fontSize: 16,
   },
@@ -136,11 +138,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   message: {
-    color: "red",
+    color: theme.colors.errorText,
     textAlign: "center",
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "red",
+    borderColor: theme.colors.errorText,
     padding: 8,
     borderRadius: 8,
   },
