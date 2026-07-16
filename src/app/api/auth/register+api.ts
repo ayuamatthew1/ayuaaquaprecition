@@ -1,4 +1,5 @@
 import { prisma } from "@/src/lib/db.server";
+import { signAccessToken, toAuthUser } from "@/src/lib/auth.server";
 import { hashPassword } from "@/src/lib/password";
 import { registerSchema } from "@/src/validations/auth.validation";
 
@@ -39,17 +40,13 @@ export async function POST(request: Request) {
         passwordHash
       }
     });
+    const accessToken = await signAccessToken(user);
 
     return Response.json(
       {
         success: true,
         message: "Account created successfully.",
-        data: {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-        },
+        data: { user: toAuthUser(user), accessToken },
       },
       {
         status: 201,

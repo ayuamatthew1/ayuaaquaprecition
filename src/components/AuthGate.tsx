@@ -16,9 +16,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       router.replace("/login-screen");
     }
 
-    if (isAuthenticated && isAuthRoute) {
-      router.replace("/");
-    }
   }, [isAuthenticated, isAuthRoute, loading, router]);
 
   if (loading) {

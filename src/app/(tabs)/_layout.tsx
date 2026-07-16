@@ -24,12 +24,6 @@ export default function TabsLayout() {
                         name="grid-outline" size={size} color={color} />,
                 }}
             />
-            {/* <Tabs.Screen
-                name="water-quality"
-                options={{
-                    title: 'Water Quality'
-                }}
-            /> */}
             <Tabs.Screen
                 name="feeding-screen"
                 options={{

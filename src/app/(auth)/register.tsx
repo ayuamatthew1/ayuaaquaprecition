@@ -1,8 +1,10 @@
 // import { registerationRequest } from "@/src/api/auth.api";
 import FormInput from "@/src/components/FormInput";
 import PasswordInput from "@/src/components/PasswordInput";
-import { theme } from "@/src/theme/theme";
+import { useAuth } from "@/src/context/AuthContext";
 import { getApiUrl } from "@/src/lib/api";
+import { theme } from "@/src/theme/theme";
+import type { AuthSession } from "@/src/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -36,6 +38,7 @@ type RegisterForm = z.infer<typeof schema>;
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { startSession } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -69,20 +72,17 @@ export default function RegisterScreen() {
         throw new Error(errorData.message || "Something went wrong.");
       }
 
-      const result = await response.json();
+      const result: { message?: string; data?: AuthSession } = await response.json();
+      if (!result.data) throw new Error("Unable to start your new session.");
 
       setMessage(result.message || "Account created successfully.");
-      Alert.alert(
-        "Success",
-        result.message || "Account created successfully."
-      );
-
       reset();
-
-      router.replace("/login-screen");
+      await startSession(result.data);
+      router.replace("../farm/farm-setup");
     } catch (error: any) {
       setMessage(error.message || "Something went wrong.");
       console.error("Registration error:", error);
+      router.replace
       Alert.alert(
         "Registration Failed",
         error.message || "Something went wrong."

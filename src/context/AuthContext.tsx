@@ -8,6 +8,7 @@ type AuthProviderProps = {
   user: AuthUser | null;
   isAuthenticated: boolean;
   signIn: (identifier: string, password: string) => Promise<void>;
+  startSession: (session: AuthSession) => Promise<void>;
   signOut: () => Promise<void>;
   authenticatedFetch: (path: string, init?: RequestInit) => Promise<Response>;
   loading: boolean;
@@ -87,8 +88,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error(result.message ?? "Invalid email or password.");
     }
 
-    await saveToken(result.data.accessToken);
-    setUser(result.data.user);
+    await startSession(result.data);
+  };
+
+  const startSession = async (session: AuthSession) => {
+    await saveToken(session.accessToken);
+    setUser(session.user);
   };
 
   const signOut = async () => {
@@ -110,7 +115,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const value = useMemo(
-    () => ({ user, isAuthenticated, signIn, signOut, authenticatedFetch, loading }),
+    () => ({ user, isAuthenticated, signIn, startSession, signOut, authenticatedFetch, loading }),
     [authenticatedFetch, isAuthenticated, loading, user],
   );
 

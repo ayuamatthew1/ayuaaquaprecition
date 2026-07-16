@@ -68,6 +68,7 @@ export default function DashboardScreen() {
         <Text style={styles.emptyText}>
           {error ?? "Connect a device to one of your ponds and send a reading to populate this dashboard."}
         </Text>
+
         {!error && (
           <TouchableOpacity style={styles.createButton} onPress={() => router.push("/ponds/create")}>
             <Ionicons name="add" size={20} color={theme.colors.surface} />
@@ -101,7 +102,7 @@ export default function DashboardScreen() {
       title: "Temperature",
       value: data.temperature,
       unit: "°C",
-      idealRange: "24–30 °C",
+      idealRange: "24-30 °C",
       status: data.temperature >= 24 && data.temperature <= 30 ? "good" : "warning",
       icon: "thermometer",
     },

@@ -21,12 +21,11 @@ export async function POST(request: Request) {
       orderBy: { createdAt: "asc" },
     });
 
-    // A farm is required by the schema. New users can start with a pond without
-    // needing to complete a separate farm-setup flow first.
     if (!farm) {
-      farm = await prisma.farm.create({
-        data: { ownerId: userId, name: "My Farm" },
-      });
+      return Response.json(
+        { success: false, message: "Set up a farm before creating a pond." },
+        { status: 409 },
+      );
     }
 
     const pond = await prisma.pond.create({
