@@ -17,9 +17,8 @@ model User {
   firstName         String
   lastName          String
   email             String         @unique
-  username          String         @unique
-  passwordHash      String
   phone             String         @unique
+  passwordHash      String
   avatar            String?
   role              UserRole       @default(FARMER)
   status            UserStatus     @default(ACTIVE)
@@ -34,7 +33,6 @@ model User {
   notifications     Notification[]
 
   @@index([email])
-  @@index([username])
   @@index([role])
   @@index([status])
 }

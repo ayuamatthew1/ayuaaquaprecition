@@ -12,19 +12,23 @@ export async function POST(request: Request) {
       where: {
         OR: [
           { email: data.identifier },
-          { username: data.identifier },
+          { phone: data.identifier },
         ],
       },
     });
 
     if (!user || user.status !== "ACTIVE") {
-      return Response.json({ success: false, message: "Invalid email or password." }, { status: 401 });
+      return Response.json({ success: false, message: "Invalid email or phone number or password." }, { status: 401 });
+    }
+    
+    if (!user || user.status !== "ACTIVE") {
+      return Response.json({ success: false, message: "Invalid email or phone number or password." }, { status: 401 });
     }
 
     const isMatch = await verifyPassword(data.password, user.passwordHash);
 
     if (!isMatch) {
-      return Response.json({ success: false, message: "Invalid email or password." }, { status: 401 });
+      return Response.json({ success: false, message: "Invalid email or phone number or password." }, { status: 401 });
     }
 
     const accessToken = await signAccessToken(user);

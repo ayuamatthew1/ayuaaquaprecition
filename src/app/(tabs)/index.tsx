@@ -40,7 +40,7 @@ export default function DashboardScreen() {
       setError(null);
       const response = await authenticatedFetch("/api/dashboard");
       const result: ApiResponse<DashboardReading | null> = await response.json();
-
+      console.log("Dashboard API response:", result);
       if (!response.ok || !result.success) {
         throw new Error(result.message ?? "Unable to load dashboard data.");
       }

@@ -22,9 +22,8 @@ const schema = z
   .object({
     firstName: z.string().min(2, "First name is required"),
     lastName: z.string().min(2, "Last name is required"),
-    username: z.string().min(3, "Username is required"),
     email: z.string().email("Enter a valid email"),
-    phone: z.string().min(7, "Phone number is required"),
+    phone: z.string().min(10, "Phone number is required"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
@@ -46,7 +45,6 @@ export default function RegisterScreen() {
     defaultValues: {
       firstName: "",
       lastName: "",
-      username: "",
       email: "",
       phone: "",
       password: "",
@@ -112,7 +110,7 @@ export default function RegisterScreen() {
         render={({ field: { value, onChange } }) => (
           <FormInput
             label="First Name"
-            placeholder="John"
+            placeholder="Enter your first name"
             value={value}
             onChangeText={onChange}
             error={errors.firstName?.message}
@@ -126,29 +124,13 @@ export default function RegisterScreen() {
         render={({ field: { value, onChange } }) => (
           <FormInput
             label="Last Name"
-            placeholder="Doe"
+            placeholder="Enter your last name"
             value={value}
             onChangeText={onChange}
             error={errors.lastName?.message}
           />
         )}
       />
-
-      <Controller
-        control={control}
-        name="username"
-        render={({ field: { value, onChange } }) => (
-          <FormInput
-            label="Username"
-            placeholder="johndoe"
-            autoCapitalize="none"
-            value={value}
-            onChangeText={onChange}
-            error={errors.username?.message}
-          />
-        )}
-      />
-
       <Controller
         control={control}
         name="email"

@@ -11,7 +11,6 @@ export async function POST(request: Request) {
       where: {
         OR: [
           { email: data.email },
-          { username: data.username },
           { phone: data.phone },
         ]
       }
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
       data: {
         firstName: data.firstName,
         lastName: data.lastName,
-        username: data.username,
         email: data.email,
         phone: data.phone,
         passwordHash
@@ -50,7 +48,6 @@ export async function POST(request: Request) {
           id: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
-          username: user.username,
           email: user.email,
         },
       },

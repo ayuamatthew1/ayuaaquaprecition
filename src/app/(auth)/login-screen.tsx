@@ -1,7 +1,7 @@
 import { Images } from "@/src/constants/images";
+import { useAuth } from "@/src/context/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { useAuth } from "@/src/context/AuthContext";
 import {
   ActivityIndicator,
   Alert,
@@ -51,7 +51,7 @@ export default function LoginScreen() {
       <Text style={styles.title}>Welcome Back</Text>
 
       <TextInput
-        placeholder="Email"
+        placeholder="Email | Phone"
         style={styles.input}
         value={identifier}
         onChangeText={setIdentifier}
