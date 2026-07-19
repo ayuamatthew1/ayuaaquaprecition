@@ -58,7 +58,9 @@ export default function DashboardScreen() {
   }, [loadDashboard]);
 
   if (loading) {
-    return <View style={styles.centered}><ActivityIndicator color={theme.colors.surface} /></View>;
+    return <View style={styles.centered}>
+      <ActivityIndicator color={theme.colors.surface} />
+    </View>;
   }
 
   if (error || !reading) {

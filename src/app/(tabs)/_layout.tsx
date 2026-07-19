@@ -1,8 +1,13 @@
+import { UserRole } from "@/prisma/generated/prisma/enums"
+import { useAuth } from "@/src/context/AuthContext"
 import { theme } from "@/src/theme/theme"
 import { Ionicons } from "@expo/vector-icons"
 import { Tabs } from "expo-router"
 
 export default function TabsLayout() {
+    const {user} = useAuth()
+    const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN
+    const isTechnician = user?.role === UserRole.TECHNICIAN
 
     return (
         <Tabs
@@ -60,6 +65,24 @@ export default function TabsLayout() {
                         size={size} color={color} />
                 }}
             />
+
+            {isAdmin && (
+                <Tabs.Screen
+                    name="admin"
+                    options={{
+                        title: 'Admin',
+                        tabBarIcon: ({ size, color }) => <Ionicons
+                            name="shield-outline" size={size} color={color} />
+                    }}
+                    listeners={({ navigation }) => ({
+                        tabPress: (e) => {
+                            e.preventDefault()
+                            navigation.navigate("admin-stack", { screen: "dashboard" })
+                        }
+                    })}
+                />
+            )}
+
             <Tabs.Screen
                 name="settings"
                 options={{
