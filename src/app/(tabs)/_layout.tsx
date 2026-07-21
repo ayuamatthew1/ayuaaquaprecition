@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { Tabs } from "expo-router"
 
 export default function TabsLayout() {
-    const {user} = useAuth()
+    const { user } = useAuth()
     const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN
     const isTechnician = user?.role === UserRole.TECHNICIAN
 
@@ -53,6 +53,15 @@ export default function TabsLayout() {
                     title: 'Ponds',
                     tabBarIcon: ({ size, color }) => <Ionicons
                         name="water-outline"
+                        size={size} color={color} />
+                }}
+            />
+            <Tabs.Screen
+                name="devices"
+                options={{
+                    title: 'Devices',
+                    tabBarIcon: ({ size, color }) => <Ionicons
+                        name="hardware-chip-outline"
                         size={size} color={color} />
                 }}
             />

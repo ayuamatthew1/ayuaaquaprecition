@@ -1,6 +1,8 @@
 export interface FeedingSchedule {
   id: string;
   pondId: string;
+  pondName?: string;
+  species?: string;
   feedType: string;
   quantity: number;
   unit: string;

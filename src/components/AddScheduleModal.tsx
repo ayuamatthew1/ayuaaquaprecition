@@ -1,7 +1,6 @@
-import { ponds } from "@/src/data/ponds";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -27,8 +26,14 @@ const DAYS = [
   "Sun",
 ];
 
+interface PondOption {
+  id: string;
+  name: string;
+}
+
 interface Props {
   visible: boolean;
+  ponds: PondOption[];
   onClose: () => void;
   onSave: (schedule: {
     pondId: string;
@@ -39,18 +44,19 @@ interface Props {
     hour: number;
     minute: number;
     repeatDays: string[];
-  }) => void;
+  }) => void | Promise<void>;
 }
 
 export default function AddScheduleModal({
   visible,
+  ponds,
   onClose,
   onSave,
 }: Props) {
 
   const [feedType, setFeedType] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [unit, setUnit] = useState("");
+  const [unit, setUnit] = useState("kg");
   const [pondId, setPondId] = useState(ponds[0]?.id || "");
   const [selectedDays, setSelectedDays] =
     useState<string[]>([]);
@@ -59,6 +65,12 @@ export default function AddScheduleModal({
 
   const [showPicker, setShowPicker] =
     useState(false);
+
+  useEffect(() => {
+    if (ponds.length > 0 && !ponds.some((pond) => pond.id === pondId)) {
+      setPondId(ponds[0].id);
+    }
+  }, [pondId, ponds]);
 
   const toggleDay = (day: string) => {
     if (selectedDays.includes(day)) {
@@ -70,13 +82,13 @@ export default function AddScheduleModal({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const formattedTime = time.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
 
-    onSave({
+    await onSave({
       pondId,
       feedType,
       quantity: Number(quantity),

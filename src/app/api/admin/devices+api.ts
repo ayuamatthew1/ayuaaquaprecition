@@ -1,6 +1,18 @@
 import { requireAdminRole, validatePondAccess } from "@/src/lib/admin.server";
 import { getAuthenticatedUserId } from "@/src/lib/auth.server";
 import { prisma } from "@/src/lib/db.server";
+import { z } from "zod";
+
+const createDeviceSchema = z.object({
+  name: z.string().trim().min(2),
+  serialNumber: z.string().trim().min(2),
+  firmwareVersion: z.string().trim().optional(),
+  hardwareVersion: z.string().trim().optional(),
+  macAddress: z.string().trim().optional(),
+  listedPrice: z.number().positive().optional(),
+  isListed: z.boolean().optional(),
+  pondId: z.string().cuid().optional(),
+});
 
 /**
  * GET /api/admin/devices - List all devices or filter by pond/farm
@@ -16,6 +28,8 @@ async function handleGet(request: Request) {
   const limit = parseInt(url.searchParams.get("limit") || "10");
   const status = url.searchParams.get("status");
   const pondId = url.searchParams.get("pondId");
+  const isListed = url.searchParams.get("isListed");
+  const owned = url.searchParams.get("owned");
 
   const skip = (page - 1) * limit;
 
@@ -25,12 +39,27 @@ async function handleGet(request: Request) {
     where.status = status;
   }
 
+  if (isListed === "true") {
+    where.isListed = true;
+  } else if (isListed === "false") {
+    where.isListed = false;
+  }
+
+  if (owned === "true") {
+    where.ownerId = { not: null };
+  } else if (owned === "false") {
+    where.ownerId = null;
+  }
+
   if (pondId) {
     await validatePondAccess(user, pondId, prisma);
     where.pondId = pondId;
   } else if (user.role === "ADMIN") {
-    // ADMIN sees devices only in their ponds
-    where.pond = { farm: { ownerId: user.id } };
+    // ADMIN sees devices only in their ponds or assigned to their farms
+    where.OR = [
+      { pond: { farm: { ownerId: user.id } } },
+      { owner: { role: "FARMER" }, pond: { farm: { ownerId: user.id } } },
+    ];
   }
 
   const [devices, total] = await Promise.all([
@@ -42,6 +71,13 @@ async function handleGet(request: Request) {
             id: true,
             name: true,
             farm: { select: { name: true } },
+          },
+        },
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
           },
         },
         sensorReadings: {
@@ -75,6 +111,40 @@ async function handleGet(request: Request) {
       },
     },
   });
+}
+
+async function handlePost(request: Request) {
+  const userId = await getAuthenticatedUserId(request);
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  requireAdminRole(user, ["SUPER_ADMIN"]);
+
+  try {
+    const data = createDeviceSchema.parse(await request.json());
+
+    const device = await prisma.device.create({
+      data: {
+        name: data.name,
+        serialNumber: data.serialNumber,
+        firmwareVersion: data.firmwareVersion || null,
+        hardwareVersion: data.hardwareVersion || null,
+        macAddress: data.macAddress || null,
+        status: "OFFLINE",
+        isListed: data.isListed ?? false,
+        listedPrice: data.listedPrice ?? null,
+        pondId: data.pondId ?? null,
+        listedById: userId,
+      },
+    });
+
+    return Response.json({ success: true, data: device }, { status: 201 });
+  } catch (error) {
+    console.error("Devices API POST error:", error);
+    const isValidationError = error instanceof z.ZodError;
+    return Response.json(
+      { success: false, message: isValidationError ? "Please provide valid device data." : error instanceof Error ? error.message : "Server error" },
+      { status: isValidationError ? 400 : 500 },
+    );
+  }
 }
 
 /**
@@ -195,6 +265,18 @@ export async function GET(request: Request) {
     return await handleGet(request);
   } catch (error) {
     console.error("Devices API GET error:", error);
+    return Response.json(
+      { success: false, message: error instanceof Error ? error.message : "Server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    return await handlePost(request);
+  } catch (error) {
+    console.error("Devices API POST error:", error);
     return Response.json(
       { success: false, message: error instanceof Error ? error.message : "Server error" },
       { status: 500 }

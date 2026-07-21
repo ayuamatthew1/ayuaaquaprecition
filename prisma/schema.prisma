@@ -31,6 +31,9 @@ model User {
   farms             Farm[]
   feedHistories     FeedHistory[]
   notifications     Notification[]
+  ownedDevices      Device[]       @relation("DeviceOwner")
+  listedDevices     Device[]       @relation("DeviceListedBy")
+  purchases         Purchase[]
 
   @@index([email])
   @@index([role])
@@ -110,13 +113,17 @@ model FishBatch {
 
 model Device {
   id              String          @id @default(cuid())
-  pondId          String          @unique
+  pondId          String?         @unique
+  ownerId         String?
+  listedById      String?
   name            String
   serialNumber    String          @unique
   firmwareVersion String?
   hardwareVersion String?
   macAddress      String?         @unique
   status          DeviceStatus    @default(OFFLINE)
+  isListed        Boolean         @default(false)
+  listedPrice     Float?
   installedAt     DateTime?
   lastSeenAt      DateTime?
   batteryLevel    Float?
@@ -125,11 +132,34 @@ model Device {
   notes           String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-  pond            Pond            @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  pond            Pond?           @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  owner           User?           @relation("DeviceOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  listedBy        User?           @relation("DeviceListedBy", fields: [listedById], references: [id], onDelete: SetNull)
   sensorReadings  SensorReading[]
+  purchases       Purchase[]
 
   @@index([status])
   @@index([lastSeenAt])
+  @@index([ownerId])
+  @@index([listedById])
+}
+
+model Purchase {
+  id               String           @id @default(cuid())
+  buyerId          String
+  deviceId         String
+  price            Float
+  status           PurchaseStatus   @default(PENDING)
+  paymentProvider  PaymentProvider?
+  paymentReference String?
+  createdAt        DateTime         @default(now())
+  completedAt      DateTime?
+
+  buyer  User   @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([buyerId])
+  @@index([deviceId])
 }
 
 model SensorReading {
@@ -381,6 +411,13 @@ enum AlertStatus {
   ACTIVE
   ACKNOWLEDGED
   RESOLVED
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
 }
 
 // AI

@@ -8,6 +8,40 @@ const createPondSchema = z.object({
   capacity: z.number().positive().optional(),
 });
 
+export async function GET(request: Request) {
+  const userId = await getAuthenticatedUserId(request);
+  if (!userId) {
+    return Response.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  }
+
+  const ponds = await prisma.pond.findMany({
+    where: { farm: { ownerId: userId } },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      name: true,
+      type: true,
+      capacity: true,
+      fishBatches: {
+        orderBy: { stockedAt: "desc" },
+        take: 1,
+        select: { species: true },
+      },
+    },
+  });
+
+  return Response.json({
+    success: true,
+    data: ponds.map((pond) => ({
+      id: pond.id,
+      name: pond.name,
+      type: pond.type,
+      capacity: pond.capacity,
+      species: pond.fishBatches[0]?.species ?? null,
+    })),
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const userId = await getAuthenticatedUserId(request);

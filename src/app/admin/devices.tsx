@@ -4,10 +4,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -20,6 +23,8 @@ interface Device {
   batteryLevel?: number;
   signalStrength?: number;
   lastSeenAt?: string;
+  isListed: boolean;
+  listedPrice?: number;
   pond: {
     id: string;
     name: string;
@@ -41,7 +46,11 @@ export default function AdminDevicesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const { authenticatedFetch } = useAuth()
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [newDeviceName, setNewDeviceName] = useState("");
+  const [newDeviceSerial, setNewDeviceSerial] = useState("");
+  const [newDevicePrice, setNewDevicePrice] = useState("");
+  const { authenticatedFetch, user } = useAuth();
 
   const fetchDevices = async () => {
     try {
@@ -74,6 +83,41 @@ export default function AdminDevicesScreen() {
   const onRefresh = () => {
     setRefreshing(true);
     fetchDevices();
+  };
+
+  const handleCreateDevice = async () => {
+    if (!newDeviceName.trim() || !newDeviceSerial.trim()) {
+      Alert.alert("Missing details", "Device name and serial number are required.");
+      return;
+    }
+
+    try {
+      const response = await authenticatedFetch("/api/admin/devices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newDeviceName,
+          serialNumber: newDeviceSerial,
+          listedPrice: newDevicePrice ? Number(newDevicePrice) : undefined,
+          isListed: Boolean(newDevicePrice),
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        Alert.alert("Upload failed", result.message || "Unable to upload device.");
+        throw new Error(result.message || "Unable to upload device.");
+      }
+
+      setCreateModalVisible(false);
+      setNewDeviceName("");
+      setNewDeviceSerial("");
+      setNewDevicePrice("");
+      fetchDevices();
+    } catch (error) {
+      Alert.alert("Upload failed", error instanceof Error ? error.message : "Unable to upload device.");
+      console.error("Create device error:", error);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -114,6 +158,12 @@ export default function AdminDevicesScreen() {
           <Text style={styles.title}>Device Management</Text>
           <Text style={styles.subtitle}>Monitor and manage IoT devices</Text>
         </View>
+        {user?.role === "SUPER_ADMIN" ? (
+          <TouchableOpacity style={styles.uploadButton} onPress={() => setCreateModalVisible(true)}>
+            <MaterialCommunityIcons name="upload" size={20} color="#fff" />
+            <Text style={styles.uploadButtonText}>Upload device</Text>
+          </TouchableOpacity>
+        ) : null}
 
         <View style={styles.filters}>
           <Text style={styles.filterLabel}>Filter by Status:</Text>
@@ -171,19 +221,33 @@ export default function AdminDevicesScreen() {
                   <View style={styles.deviceHeader}>
                     <View style={styles.deviceInfo}>
                       <Text style={styles.deviceName}>{device.name}</Text>
-                      <Text style={styles.pondName}>
-                        {device.pond.farm.name} - {device.pond.name}
-                      </Text>
                       <Text style={styles.serialNumber}>S/N: {device.serialNumber}</Text>
+                      {
+                        device.isListed ? (
+                          <Text style={styles.pondName}>Listed for sale</Text>
+                        ) : (
+                          <>
+                            {
+                              device.pond ? (
+                                <Text style={styles.pondName}>
+                                  {device.pond.farm.name} - {device.pond.name}
+                                </Text>
+                              ) : (
+                                <Text style={styles.pondName}>Pond Not assigned</Text>
+                              )
+                            }
+                          </>
+                        )
+                      }
                     </View>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(device.status) }]}>
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(device.status) || "#27ae60" }]}>
                       <View
                         style={[
                           styles.statusDot,
                           { backgroundColor: getStatusColor(device.status) },
                         ]}
                       />
-                      <Text style={styles.statusText}>{device.status}</Text>
+                      <Text style={styles.statusText}>{!device.isListed ? device.status : device.listedPrice}</Text>
                     </View>
                   </View>
 
@@ -240,7 +304,45 @@ export default function AdminDevicesScreen() {
           )}
         </ScrollView>
       </View>
-    </AdminGate>
+
+      <Modal animationType="slide" transparent visible={createModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Upload Device</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Device name"
+              value={newDeviceName}
+              onChangeText={setNewDeviceName}
+              placeholderTextColor="#8e9aac"
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Serial number"
+              value={newDeviceSerial}
+              onChangeText={setNewDeviceSerial}
+              placeholderTextColor="#8e9aac"
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Price (optional)"
+              value={newDevicePrice}
+              onChangeText={setNewDevicePrice}
+              placeholderTextColor="#8e9aac"
+              keyboardType="numeric"
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.secondaryButton} onPress={() => setCreateModalVisible(false)}>
+                <Text style={styles.secondaryButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.primaryButton} onPress={handleCreateDevice}>
+                <Text style={styles.primaryButtonText}>Upload</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </AdminGate >
   );
 }
 
@@ -424,6 +526,70 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     minHeight: 300,
+  },
+  uploadButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2980b9",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    margin: 16,
+    gap: 8,
+  },
+  uploadButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.45)",
+  },
+  modalCard: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 14,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#ecf0f1",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    color: "#2c3e50",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  primaryButton: {
+    backgroundColor: "#2980b9",
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+  },
+  primaryButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    backgroundColor: "#f8f9fa",
+  },
+  secondaryButtonText: {
+    color: "#2c3e50",
+    fontWeight: "700",
   },
   emptyText: {
     marginTop: 12,
