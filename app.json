@@ -28,7 +28,10 @@
     },
     "plugins": [
       [
-        "expo-router"
+        "expo-router",
+        {
+          "origin": "http://10.193.198.159:8081"
+        }
       ],
       [
         "expo-splash-screen",

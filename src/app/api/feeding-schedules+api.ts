@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
   try {
     const userId = await getAuthenticatedUserId(request);
-    
+
     if (!userId) {
       return Response.json({ success: false, message: "Unauthorized." }, { status: 401 });
     }
@@ -90,6 +90,8 @@ export async function POST(request: Request) {
       select: { id: true, name: true },
     });
 
+    console.log("Pond found:", pond);
+
     if (!pond) {
       return Response.json({ success: false, message: "Pond not found." }, { status: 404 });
     }
@@ -97,7 +99,7 @@ export async function POST(request: Request) {
     const schedule = await prisma.feedingSchedule.create({
       data: {
         pondId: pond.id,
-        feedType: data.feedType as any,
+        feedType: data.feedType,
         quantity: data.quantity,
         unit: data.unit,
         feedTime: formatFeedTime(data.hour, data.minute),
@@ -127,6 +129,7 @@ export async function POST(request: Request) {
     }, { status: 201 });
   } catch (error) {
     const isValidationError = error instanceof z.ZodError;
+    console.error("Error creating feeding schedule:", error);
     return Response.json(
       { success: false, message: isValidationError ? "Please enter valid schedule details." : "Unable to create feeding schedule." },
       { status: isValidationError ? 400 : 500 },

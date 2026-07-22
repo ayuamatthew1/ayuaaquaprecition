@@ -26,6 +26,15 @@ const DAYS = [
   "Sun",
 ];
 
+const FEED_TYPES = [
+  "STARTER",
+  "GROWER",
+  "FINISHER",
+  "FLOATING",
+  "SINKING",
+  "CUSTOM"
+];
+
 interface PondOption {
   id: string;
   name: string;
@@ -71,6 +80,11 @@ export default function AddScheduleModal({
       setPondId(ponds[0].id);
     }
   }, [pondId, ponds]);
+  useEffect(() => {
+    if (FEED_TYPES.length > 0 && !FEED_TYPES.some((type) => type === feedType)) {
+      setFeedType(FEED_TYPES[0]);
+    }
+  }, [feedType, FEED_TYPES]);
 
   const toggleDay = (day: string) => {
     if (selectedDays.includes(day)) {
@@ -86,6 +100,12 @@ export default function AddScheduleModal({
     const formattedTime = time.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
+    });
+
+    console.log("Saving schedule with details:", {
+      pondId,
+      feedType,
+      quantity: Number(quantity),
     });
 
     await onSave({
@@ -123,13 +143,27 @@ export default function AddScheduleModal({
                 contentContainerStyle={styles.scrollContent}
                 keyboardShouldPersistTaps="handled"
               >
-                <TextInput
-                  placeholder="Feed Type"
-                  value={feedType}
-                  onChangeText={() => setFeedType}
-                  style={styles.input}
-                />
 
+                <Text style={styles.sectionTitle}>
+                  Select Feed Type
+                </Text>
+
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={feedType}
+                    onValueChange={(itemValue) =>
+                      setFeedType(itemValue)
+                    }
+                  >
+                    {FEED_TYPES.map((item) => (
+                      <Picker.Item
+                        key={item}
+                        label={item}
+                        value={item.toLocaleLowerCase()}
+                      />
+                    ))}
+                  </Picker>
+                </View>
                 <Text style={styles.sectionTitle}>
                   Select Pond
                 </Text>
@@ -172,12 +206,16 @@ export default function AddScheduleModal({
                       }
                     >
                       <Picker.Item
-                        label={'kilograms'}
-                        value={'kg'}
+                        label={'Kilograms'}
+                        value={'KG'}
                       />
                       <Picker.Item
-                        label={'grams'}
-                        value={'g'}
+                        label={'Grams'}
+                        value={'G'}
+                      />
+                      <Picker.Item
+                        label={'Bag'}
+                        value={'Bag'}
                       />
                     </Picker>
                   </View>

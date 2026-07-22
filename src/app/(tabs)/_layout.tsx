@@ -77,7 +77,7 @@ export default function TabsLayout() {
 
             {isAdmin && (
                 <Tabs.Screen
-                    name="admin"
+                    name="admin/dashboard"
                     options={{
                         title: 'Admin',
                         tabBarIcon: ({ size, color }) => <Ionicons
