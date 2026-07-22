@@ -126,7 +126,7 @@ export default function AddScheduleModal({
                 <TextInput
                   placeholder="Feed Type"
                   value={feedType}
-                  onChangeText={setFeedType}
+                  onChangeText={() => setFeedType}
                   style={styles.input}
                 />
 

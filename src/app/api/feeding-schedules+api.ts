@@ -59,7 +59,7 @@ export async function GET(request: Request) {
 
   return Response.json({
     success: true,
-    data: schedules.map((schedule) => ({
+    data: schedules.map((schedule: any) => ({
       id: schedule.id,
       pondId: schedule.pondId,
       feedType: schedule.feedType,
@@ -75,8 +75,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+
   try {
     const userId = await getAuthenticatedUserId(request);
+    
     if (!userId) {
       return Response.json({ success: false, message: "Unauthorized." }, { status: 401 });
     }

@@ -133,7 +133,7 @@ export default function FeedingScheduleScreen() {
       Alert.alert("Save failed", "User not authenticated.");
       return;
     };
-    if (newSchedule.pondId === "") {
+    if (!newSchedule.pondId) {
       Alert.alert("Save failed", "Please select a pond.");
       return;
     };
