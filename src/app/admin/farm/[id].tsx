@@ -1,4 +1,4 @@
-import { AdminGate } from "@/src/components/AdminGate";
+import { AdminGate } from "@/src/components/adminComponents/AdminGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";

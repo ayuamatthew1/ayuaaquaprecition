@@ -1,4 +1,4 @@
-import { AdminGate } from "@/src/components/AdminGate";
+import { AdminGate } from "@/src/components/adminComponents/AdminGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";

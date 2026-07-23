@@ -1,5 +1,5 @@
-import { DashboardOverview } from "@/src/components/AdminDashboardOverview";
-import { AdminGate, useAdminAccess } from "@/src/components/AdminGate";
+import { DashboardOverview } from "@/src/components/adminComponents/AdminDashboardOverview";
+import { useAdminAccess } from "@/src/components/adminComponents/AdminGate";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -85,80 +85,76 @@ export default function AdminDashboardScreen() {
 
   if (!hasAccess) {
     return (
-      <AdminGate>
-        <View style={styles.container} />
-      </AdminGate>
+      <View style={styles.container} />
     );
   }
 
   return (
-    <AdminGate>
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.content}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        >
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.greeting}>
-                Welcome back, {user?.firstName}! 👋
-              </Text>
-              <Text style={styles.role}>{user?.role} Dashboard</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.profileButton}
-              onPress={() => router.push("(tabs)/settings" as any)}
-            >
-              <MaterialCommunityIcons name="account-circle" size={32} color="#3498db" />
-            </TouchableOpacity>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>
+              Welcome back, {user?.firstName}! 👋
+            </Text>
+            <Text style={styles.role}>{user?.role} Dashboard</Text>
           </View>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => router.push("(tabs)/settings" as any)}
+          >
+            <MaterialCommunityIcons name="account-circle" size={32} color="#3498db" />
+          </TouchableOpacity>
+        </View>
 
-          <DashboardOverview stats={stats} loading={loading} onStatPress={handleStatPress} />
+        <DashboardOverview stats={stats} loading={loading} onStatPress={handleStatPress} />
 
-          <View style={styles.quickAccessSection}>
-            <Text style={styles.sectionTitle}>Quick Access</Text>
-            <View style={styles.quickAccessGrid}>
-              <QuickAccessButton
-                icon="account-multiple"
-                label="Users"
-                color="#3498db"
-                onPress={() => router.push("admin/users" as any)}
-              />
-              <QuickAccessButton
-                icon="farm"
-                label="Farms"
-                color="#27ae60"
-                onPress={() => router.push("admin/farms" as any)}
-              />
-              <QuickAccessButton
-                icon="alert-circle"
-                label="Alerts"
-                color="#e74c3c"
-                onPress={() => router.push("admin/alerts" as any)}
-              />
-              <QuickAccessButton
-                icon="wifi"
-                label="Devices"
-                color="#2980b9"
-                onPress={() => router.push("admin/devices" as any)}
-              />
-              <QuickAccessButton
-                icon="credit-card"
-                label="Subscriptions"
-                color="#f39c12"
-                onPress={() => router.push("admin/subscriptions" as any)}
-              />
-              <QuickAccessButton
-                icon="chart-line"
-                label="Analytics"
-                color="#9b59b6"
-                onPress={() => router.push("admin/analytics" as any)}
-              />
-            </View>
+        <View style={styles.quickAccessSection}>
+          <Text style={styles.sectionTitle}>Quick Access</Text>
+          <View style={styles.quickAccessGrid}>
+            <QuickAccessButton
+              icon="account-multiple"
+              label="Users"
+              color="#3498db"
+              onPress={() => router.push("admin/users" as any)}
+            />
+            <QuickAccessButton
+              icon="farm"
+              label="Farms"
+              color="#27ae60"
+              onPress={() => router.push("admin/farms" as any)}
+            />
+            <QuickAccessButton
+              icon="alert-circle"
+              label="Alerts"
+              color="#e74c3c"
+              onPress={() => router.push("admin/alerts" as any)}
+            />
+            <QuickAccessButton
+              icon="wifi"
+              label="Devices"
+              color="#2980b9"
+              onPress={() => router.push("admin/devices" as any)}
+            />
+            <QuickAccessButton
+              icon="credit-card"
+              label="Subscriptions"
+              color="#f39c12"
+              onPress={() => router.push("admin/subscriptions" as any)}
+            />
+            <QuickAccessButton
+              icon="chart-line"
+              label="Analytics"
+              color="#9b59b6"
+              onPress={() => router.push("admin/analytics" as any)}
+            />
           </View>
-        </ScrollView>
-      </View>
-    </AdminGate>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 

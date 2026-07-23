@@ -1,5 +1,3 @@
-import AddScheduleModal from "@/src/components/AddScheduleModal";
-import FeedingScheduleCard from "@/src/components/FeedingScheduleCard";
 import { useAuth } from "@/src/context/AuthContext";
 import { cancelUserFeedingNotifications, requestNotificationPermissions, scheduleFeedingNotification } from "@/src/services/notificationService";
 import { FeedingHistory } from "@/src/types/feedingHistory";
@@ -16,6 +14,8 @@ import {
   View,
 } from "react-native";
 import { theme } from "../../theme/theme";
+import FeedingScheduleCard from "@/src/components/scheduleCompnents/FeedingScheduleCard";
+import AddScheduleModal from "@/src/components/scheduleCompnents/AddScheduleModal";
 
 type PondOption = {
   id: string;
@@ -70,7 +70,7 @@ export default function FeedingScheduleScreen() {
         isActive: schedule.isActive,
       }));
 
-      const loadedPonds = (pondsResult.data ?? []).map((pond: any) => ({
+      const loadedPonds = (pondsResult.data.ponds ?? []).map((pond: any) => ({
         id: pond.id,
         name: pond.name,
         species: pond.species,

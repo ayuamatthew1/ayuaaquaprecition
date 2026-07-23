@@ -1,4 +1,3 @@
-import { AdminGate } from "@/src/components/AdminGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -38,7 +37,7 @@ export default function AdminPondsScreen() {
   };
 
   return (
-    <AdminGate>
+    <View>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Pond Management</Text>
@@ -66,7 +65,7 @@ export default function AdminPondsScreen() {
           )}
         </ScrollView>
       </View>
-    </AdminGate>
+    </View>
   );
 }
 

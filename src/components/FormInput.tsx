@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
     fontWeight: "600",
-    color: theme.colors.primary,
+    color: theme.colors.surface,
   },
 
   input: {

@@ -1,6 +1,6 @@
 import { prisma } from "@/src/lib/db.server";
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     const devices = await prisma.device.findMany({
       where: {

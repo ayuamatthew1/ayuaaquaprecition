@@ -1,6 +1,5 @@
 import { UserRole } from "@/prisma/generated/prisma/enums";
-import { AdminGate } from "@/src/components/AdminGate";
-import { AdminUserList } from "@/src/components/AdminUserList";
+import { AdminUserList } from "@/src/components/adminComponents/AdminUserList";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -101,7 +100,7 @@ export default function AdminUsersScreen() {
   );
 
   return (
-    <AdminGate>
+    <View>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Users Management</Text>
@@ -185,7 +184,7 @@ export default function AdminUsersScreen() {
           )}
         </ScrollView>
       </View>
-    </AdminGate>
+    </View>
   );
 }
 

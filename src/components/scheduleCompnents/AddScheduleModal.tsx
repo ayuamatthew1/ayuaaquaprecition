@@ -14,7 +14,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { theme } from "../theme/theme";
+import { theme } from "../../theme/theme";
 
 const DAYS = [
   "Mon",
@@ -80,6 +80,7 @@ export default function AddScheduleModal({
       setPondId(ponds[0].id);
     }
   }, [pondId, ponds]);
+
   useEffect(() => {
     if (FEED_TYPES.length > 0 && !FEED_TYPES.some((type) => type === feedType)) {
       setFeedType(FEED_TYPES[0]);
@@ -372,6 +373,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     marginBottom: 12,
+    borderColor: "#dcdcdc"
   },
 
   daysContainer: {

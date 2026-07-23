@@ -1,6 +1,6 @@
 import { AlertSeverity, AlertStatus } from "@/prisma/generated/prisma/enums";
-import { AdminAlertList } from "@/src/components/AdminAlertList";
-import { AdminGate } from "@/src/components/AdminGate";
+import { AdminAlertList } from "@/src/components/adminComponents/AdminAlertList";
+import { AdminGate } from "@/src/components/adminComponents/AdminGate";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";

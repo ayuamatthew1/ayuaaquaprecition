@@ -1,7 +1,7 @@
+import { theme } from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { theme } from "../theme/theme";
 
 type Severity = "LOW" | "MEDIUM" | "HIGH";
 

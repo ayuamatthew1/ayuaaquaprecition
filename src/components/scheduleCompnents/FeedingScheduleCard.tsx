@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
-import { theme } from "../theme/theme";
+import { theme } from "../../theme/theme";
 
 interface Props {
   feedType: string;
@@ -34,6 +34,7 @@ export default function FeedingScheduleCard({
   completedAt,
   onComplete
 }: Props) {
+  
   return (
     <View style={styles.card}>
       <View style={styles.header}>

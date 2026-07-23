@@ -1,9 +1,9 @@
 import { UserRole } from "@/prisma/generated/prisma/enums";
+import { useAuth } from "@/src/context/AuthContext";
+import { theme } from "@/src/theme/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
-import { useAuth } from "../context/AuthContext";
-import { theme } from "../theme/theme";
 
 interface AdminGateProps {
   children: React.ReactNode;

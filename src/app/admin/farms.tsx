@@ -1,5 +1,4 @@
-import { AdminFarmList } from "@/src/components/AdminFarmList";
-import { AdminGate } from "@/src/components/AdminGate";
+import { AdminFarmList } from "@/src/components/adminComponents/AdminFarmList";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -88,7 +87,7 @@ export default function AdminFarmsScreen() {
   );
 
   return (
-    <AdminGate>
+    <View>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Farms Management</Text>
@@ -172,7 +171,7 @@ export default function AdminFarmsScreen() {
           )}
         </ScrollView>
       </View>
-    </AdminGate>
+    </View>
   );
 }
 

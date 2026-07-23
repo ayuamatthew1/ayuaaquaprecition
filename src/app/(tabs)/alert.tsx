@@ -1,5 +1,5 @@
 import { predictWaterQuality } from "@/src/ai/waterQualityPredictor";
-import AlertCenter from "@/src/components/AlertCenter";
+import AlertCenter from "@/src/components/alertsComponents/AlertCenter";
 import { sensorData } from "@/src/data/sensorData";
 import { theme } from "@/src/theme/theme";
 import React from "react";

@@ -1,4 +1,3 @@
-import { AdminGate } from "@/src/components/AdminGate";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -91,7 +90,7 @@ export default function AdminSubscriptionsScreen() {
   };
 
   return (
-    <AdminGate>
+    <View>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Subscriptions</Text>
@@ -208,7 +207,7 @@ export default function AdminSubscriptionsScreen() {
           )}
         </ScrollView>
       </View>
-    </AdminGate>
+    </View>
   );
 }
 

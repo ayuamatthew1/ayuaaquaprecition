@@ -1,4 +1,3 @@
-import { AdminGate } from "@/src/components/AdminGate";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -152,7 +151,7 @@ export default function AdminDevicesScreen() {
   };
 
   return (
-    <AdminGate>
+    <View>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Device Management</Text>
@@ -342,7 +341,7 @@ export default function AdminDevicesScreen() {
           </View>
         </View>
       </Modal>
-    </AdminGate >
+    </View >
   );
 }
 

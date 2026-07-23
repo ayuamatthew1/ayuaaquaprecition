@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { theme } from "../theme/theme";
 import AlertItem from "./AlertItem";
+import { theme } from "@/src/theme/theme";
 
 interface Alert {
   alert: string;
