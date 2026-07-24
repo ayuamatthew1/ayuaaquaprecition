@@ -138,7 +138,7 @@ export async function GET(request: Request) {
             lastSeenAt: pond.device.lastSeenAt,
           }
           : null,
-        readings: readings.map((reading) => ({
+        readings: readings.map((reading: any) => ({
           temperature: reading.temperature,
           ph: reading.ph,
           dissolvedOxygen: reading.dissolvedOxygen,
@@ -162,7 +162,7 @@ export async function GET(request: Request) {
             recordedAt: readings[readings.length - 1].recordedAt.toISOString(),
           }
           : null,
-        schedules: pond.feedingSchedules.map((schedule) => ({
+        schedules: pond.feedingSchedules.map((schedule: any) => ({
           id: schedule.id,
           feedType: schedule.feedType,
           quantity: schedule.quantity,
@@ -175,7 +175,7 @@ export async function GET(request: Request) {
             minute: "2-digit",
           }),
         })),
-        alerts: pond.alerts.map((alert) => ({
+        alerts: pond.alerts.map((alert: any) => ({
           id: alert.id,
           title: alert.title,
           message: alert.message,

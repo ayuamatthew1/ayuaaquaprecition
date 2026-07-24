@@ -1,25 +1,26 @@
 import { predictWaterQuality } from "@/src/ai/waterQualityPredictor";
 import WaterQualityChart from "@/src/components/WaterQualityChart";
-import { recentAlerts } from "@/src/data/alerts";
-import { devices } from "@/src/data/device";
-import { feedingSchedules } from "@/src/data/feedingSchedules";
-import { ponds } from "@/src/data/ponds";
-import { sensorReadings } from "@/src/data/sensorReading";
+import { useAuth } from "@/src/context/AuthContext";
 import { theme } from "@/src/theme/theme";
 import { calculateWaterQuality } from "@/src/utils/calculateWaterQuality";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 export default function PondDetailsScreen() {
   const { id } = useLocalSearchParams();
+  const { authenticatedFetch } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [pondData, setPondData] = useState<any>(null);
 
   const [selectedMetric, setSelectedMetric] = useState<
     | "temperature"
@@ -29,35 +30,71 @@ export default function PondDetailsScreen() {
     | "ammonia"
   >("temperature");
 
-  const pond = ponds.find((p) => p.id === id);
+  const loadPond = useCallback(async () => {
+    try {
+      setLoading(true);
 
-  if (!pond) {
+      const response = await authenticatedFetch(`/api/ponds/${id}`);
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message);
+      }
+
+      setPondData(result.data);
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error instanceof Error
+          ? error.message
+          : "Unable to load pond."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [authenticatedFetch, id]);
+
+  useEffect(() => {
+    void loadPond();
+  }, [loadPond]);
+
+
+  if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.error}>
-          Pond not found
-        </Text>
+        <ActivityIndicator
+          size="large"
+          color={theme.colors.primary}
+        />
       </View>
     );
   }
 
-  const device = devices.find(
-    (d) => d.id === pond.deviceId
-  );
 
-  const pondReadings = sensorReadings
-    .filter((reading) => reading.deviceId === device?.id)
-    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+  if (!pondData) {
+    return (
+      <View style={styles.container}>
+        <Text>Pond not found.</Text>
+      </View>
+    );
+  }
+  const pond = pondData.pond;
+  const device = pondData.device;
+  const pondReadings = pondData.readings;
+  const pondSchedules = pondData.schedules;
+  const pondAlerts = pondData.alerts;
+  const sensor = pondData.latestReading;
 
   const hasReadings = pondReadings.length > 0;
-
   const metricValues = hasReadings
-    ? pondReadings.map((reading) => reading[selectedMetric])
+    ? pondReadings.map((reading: any) => reading[selectedMetric])
     : [];
 
   const average =
     metricValues.length > 0
-      ? metricValues.reduce((sum, value) => sum + value, 0) /
+      ? metricValues.reduce((sum: number, value: number) => sum + value, 0) /
       metricValues.length
       : 0;
 
@@ -87,14 +124,6 @@ export default function PondDetailsScreen() {
       trendIcon = "↓";
     }
   }
-
-  const sensor = hasReadings
-    ? pondReadings[pondReadings.length - 1]
-    : undefined;
-
-  const pondSchedules = feedingSchedules.filter(
-    (schedule) => schedule.pondId === pond.id
-  );
 
   const alerts = sensor ? predictWaterQuality(sensor) : [];
 
@@ -146,10 +175,6 @@ export default function PondDetailsScreen() {
               ? 60
               : 40)) / 2
     ) : 0;
-
-  const pondAlerts = recentAlerts.filter(
-    (alert) => alert.pondId === pond.id
-  );
 
   const batteryColor =
     device?.batteryLevel! >= 70
@@ -463,7 +488,7 @@ export default function PondDetailsScreen() {
         </View>
       )}
 
-      {pondSchedules.map((schedule) => (
+      {pondSchedules.map((schedule: any) => (
         <View
           key={schedule.id}
           style={styles.feedCard}
@@ -793,7 +818,7 @@ export default function PondDetailsScreen() {
           </Text>
         </View>
       ) : (
-        pondAlerts.map((alert) => (
+        pondAlerts.map((alert: any) => (
           <View
             key={alert.id}
             style={styles.alertCard}
