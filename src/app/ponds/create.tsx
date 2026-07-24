@@ -17,13 +17,15 @@ type ApiResponse = {
 export default function CreatePondScreen() {
   const { authenticatedFetch } = useAuth();
   const [name, setName] = useState("");
-  const [type, setType] = useState<PondType>("EARTHEN");
+  const [type, setType] = useState<PondType>("CONCRETE");
   const [capacity, setCapacity] = useState("");
+  const [waterVolume, setWaterVolume] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const createPond = async () => {
     const parsedCapacity = capacity.trim() ? Number(capacity) : undefined;
+    const parsedWaterVolume = waterVolume.trim() ? Number(waterVolume) : undefined;
 
     if (!name.trim()) {
       setError("Enter a name for this pond.");
@@ -41,7 +43,7 @@ export default function CreatePondScreen() {
       const response = await authenticatedFetch("/api/ponds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), type, capacity: parsedCapacity }),
+        body: JSON.stringify({ name: name.trim(), type, capacity: parsedCapacity, waterVolume: parsedWaterVolume }),
       });
       const result: ApiResponse = await response.json();
       if (!response.ok || !result.success) {
@@ -49,7 +51,7 @@ export default function CreatePondScreen() {
       }
 
       Alert.alert("Pond created", "Your pond is ready. Connect a monitoring device to begin receiving readings.");
-      router.replace("/");
+      router.replace("/ponds");
 
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Unable to create pond.");
@@ -67,6 +69,35 @@ export default function CreatePondScreen() {
       <Text style={styles.title}>Create a pond</Text>
       <Text style={styles.subtitle}>Add your first pond now, then connect its monitoring device when ready.</Text>
 
+      <FormInput
+        label="Pond name"
+        placeholder="e.g. Nursery Pond A"
+        value={name}
+        onChangeText={setName}
+        error={error && !name.trim() ? error : undefined}
+      />
+
+      <FormInput
+        label="Pond Capacity "
+        placeholder="How many fish can this pond contain"
+        value={capacity}
+        onChangeText={setCapacity}
+        keyboardType="decimal-pad"
+        error={capacity.trim() ? error : undefined}
+      />
+
+      <FormInput
+        label="Water volume"
+        placeholder="eg 10000..."
+        value={waterVolume}
+        onChangeText={setWaterVolume}
+        keyboardType="decimal-pad"
+        error={capacity.trim() ? error : undefined}
+      />
+
+      {error && name.trim() && !capacity.trim() && <Text style={styles.error}>{error}</Text>}
+
+
       <Text style={styles.label}>Pond type</Text>
       <View style={styles.typeGrid}>
         {pondTypes.map((pondType) => (
@@ -83,24 +114,6 @@ export default function CreatePondScreen() {
       </View>
 
 
-      <FormInput
-        label="Pond name"
-        placeholder="e.g. Nursery Pond A"
-        value={name}
-        onChangeText={setName}
-        error={error && !name.trim() ? error : undefined}
-      />
-
-      <FormInput
-        label="Capacity in litres (optional)"
-        placeholder="e.g. 10000"
-        value={capacity}
-        onChangeText={setCapacity}
-        keyboardType="decimal-pad"
-        error={capacity.trim() ? error : undefined}
-      />
-
-      {error && name.trim() && !capacity.trim() && <Text style={styles.error}>{error}</Text>}
 
       <TouchableOpacity
         style={[styles.submitButton, submitting && styles.submitButtonDisabled]}

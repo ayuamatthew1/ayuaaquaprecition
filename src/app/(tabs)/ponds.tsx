@@ -2,6 +2,8 @@ import PondCard from "@/src/components/pondComponents/PondCard";
 import { useAuth } from "@/src/context/AuthContext";
 import { theme } from "@/src/theme/theme";
 import { FishItem } from "@/src/types/fishItem";
+import { PondWithFishBatch } from "@/src/types/pondsWithFish";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -10,18 +12,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
-interface PondItem {
-  id: string;
-  name: string;
-  species: string | null;
-  fishCount: number;
-  waterVolume: number;
-  hasFish: boolean;
-  hasDevice: boolean;
-};
 
 type UserDevice = {
   id: string;
@@ -37,7 +31,7 @@ type ApiResponse<T> = {
 export default function PondsScreen() {
   const { authenticatedFetch } = useAuth();
 
-  const [ponds, setPonds] = useState<PondItem[]>([]);
+  const [ponds, setPonds] = useState<PondWithFishBatch[]>([]);
   const [devices, setDevices] = useState<UserDevice[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +44,7 @@ export default function PondsScreen() {
         authenticatedFetch("/api/devices/user-devices"),
       ]);
 
-      const pondResult: ApiResponse<{ ponds: PondItem[] }> =
+      const pondResult: ApiResponse<{ ponds: PondWithFishBatch[] }> =
         await pondResponse.json().catch(() => ({
           success: false,
           message: "Invalid response from ponds endpoint.",
@@ -197,48 +191,54 @@ export default function PondsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Ponds</Text>
-      <Text style={styles.subtitle}>Manage all hatchery ponds</Text>
+    <>
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>Ponds</Text>
+        <Text style={styles.subtitle}>Manage all hatchery ponds</Text>
 
-      {loading ? (
-        <View style={styles.loadingState}>
-          <ActivityIndicator
-            size="large"
-            color={theme.colors.primary}
-          />
-          <Text style={styles.loadingText}>
-            Loading ponds...
+        {loading ? (
+          <View style={styles.loadingState}>
+            <ActivityIndicator
+              size="large"
+              color={theme.colors.primary}
+            />
+            <Text style={styles.loadingText}>
+              Loading ponds...
+            </Text>
+          </View>
+        ) : ponds.length === 0 ? (
+          <Text style={styles.emptyState}>
+            No ponds yet. Create one to get started.
           </Text>
-        </View>
-      ) : ponds.length === 0 ? (
-        <Text style={styles.emptyState}>
-          No ponds yet. Create one to get started.
-        </Text>
-      ) : (
-        ponds.map((pond) => (
-          <PondCard
-            key={pond.id}
-            pondId={pond.id}
-            name={pond.name}
-            species={pond.species ?? "No fish yet"}
-            fishCount={pond.fishCount}
-            waterVolume={pond.waterVolume}
-            hasFish={pond.hasFish}
-            hasDevice={pond.hasDevice}
-            unAssignedDevices={devices}
-            onCreateFishBatch={handleCreateFishBatch}
-            onAddDevice={handleAddDevice}
-            onPress={() =>
-              router.push({
-                pathname: "/ponds/[id]",
-                params: { id: pond.id },
-              })
-            }
-          />
-        ))
-      )}
-    </ScrollView>
+        ) : (
+          ponds.map((pond) => (
+            <PondCard
+              key={pond.id}
+              pondId={pond.id}
+              name={pond.name}
+              species={pond.fishBatches[0]?.species ?? "No fish"}
+              fishCount={pond.fishBatches[0]?.quantity ?? 0}
+              hasFish={pond.fishBatches.length > 0}
+              waterVolume={pond.waterVolume || 0}
+              hasDevice={pond.device === null ? false : true}
+              unAssignedDevices={devices}
+              onCreateFishBatch={handleCreateFishBatch}
+              onAddDevice={handleAddDevice}
+              onPress={() =>
+                router.push({
+                  pathname: "/ponds/[id]",
+                  params: { id: pond.id },
+                })
+              }
+            />
+          ))
+        )}
+
+      </ScrollView>
+      <TouchableOpacity style={styles.fab} onPress={() => router.push("/ponds/create")}>
+        <Ionicons name="add" size={30} color="#fff" />
+      </TouchableOpacity>
+    </>
   );
 }
 
@@ -272,5 +272,18 @@ const styles = StyleSheet.create({
     color: theme.colors.surface,
     textAlign: "center",
     marginTop: 16,
+  },
+
+  fab: {
+    position: "absolute",
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: theme.colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
   },
 });

@@ -39,6 +39,15 @@ export async function POST(request: Request) {
       return Response.json({ success: false, message: "Pond not found." }, { status: 404 });
     }
 
+    const unharvestedFishBatch = await prisma.fishBatch.findMany({
+      where: { harvestedAt: null }
+    })
+
+    if (unharvestedFishBatch) {
+      console.log("Fish are currently in Pond: ", unharvestedFishBatch)
+      return Response.json({ success: false, message: "Fish Batch Already exists in the pond, Harvest to add next batch " }, { status: 401 })
+    }
+
     const fishBatch = await prisma.fishBatch.create({
       data: {
         pondId: pond.id,

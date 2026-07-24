@@ -60,8 +60,9 @@ export default function PondCard({
               </>
             ) : <Text>No fishes yet</Text>
           }
-          <Text style={styles.label}>Water Volume: {waterVolume ? waterVolume.toLocaleString() + " L" : "Not Specified"} </Text>
-
+          <Text style={styles.label}>
+            Water Volume: {waterVolume ? waterVolume.toLocaleString() + " L" : "Not Specified"}
+          </Text>
           <View style={styles.footer}>
             <Text style={styles.viewMore}>View Details</Text>
             <Ionicons name="chevron-forward" size={18} color={theme.colors.surface} />
