@@ -63,22 +63,27 @@ export default function AddFishModal({
                 keyboardShouldPersistTaps="handled"
               >
                 <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={deviceId}
-                    onValueChange={(itemValue) =>
-                      setDeviceId(itemValue)
-                    }
-                  >
-                    {devices.length === 0 ?
-                      <Text>No Available device</Text>
-                      : devices.map((item) => (
-                        <Picker.Item
-                          key={item.id}
-                          label={item.name}
-                          value={item.id}
-                        />
-                      ))}
-                  </Picker>
+                  {
+                    devices.length === 0 ?
+                      <Text style={{ padding: 15 }}>No Available device</Text>
+                      :
+                      <Picker
+                        selectedValue={deviceId}
+                        onValueChange={(itemValue) =>
+                          setDeviceId(itemValue)
+                        }
+                      >
+                        {
+                          devices.map((item) => (
+                            <Picker.Item
+                              key={item.id}
+                              label={item.name}
+                              value={item.id}
+                            />
+                          ))
+                        }
+                      </Picker>
+                  }
                 </View>
 
 

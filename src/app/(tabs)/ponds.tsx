@@ -190,6 +190,51 @@ export default function PondsScreen() {
     }
   };
 
+  const simulateReading = async (sensor:
+    {
+      deviceId: string,
+      temperature: number,
+      ph: number,
+      dissolvedOxygen: number,
+      turbidity: number,
+      ammonia: number,
+    }
+  ) => {
+    const data = {
+      deviceId: sensor.deviceId,
+      temperature: sensor.temperature,
+      ph: sensor.ph,
+      dissolvedOxygen: sensor.dissolvedOxygen,
+      turbidity: sensor.turbidity,
+      ammonia: sensor.ammonia
+    }
+    console.log('Simalating...')
+    try {
+
+      const response = await authenticatedFetch("/api/sensor-readings", {
+        method: "POST",
+        headers: { "content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const resData = await response.json().catch(() => ({
+        success: false,
+        message: "Invalid Response."
+      }));
+
+      console.log("Response Status: ", response.status)
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.message || "Unable to Simulate readings, Please try again");
+      }
+      Alert.alert("Success", resData.message || "Readings Simulated successfully.");
+
+    } catch (error) {
+      console.error("Front End Error: ", error)
+      const message = error instanceof Error ? error.message : "Unable to simulate reading."
+      Alert.alert('Simulation Failed', message)
+    }
+  }
+
   return (
     <>
       <ScrollView style={styles.container}>
@@ -214,6 +259,7 @@ export default function PondsScreen() {
           ponds.map((pond) => (
             <PondCard
               key={pond.id}
+              deviceId={pond.device?.id}
               pondId={pond.id}
               name={pond.name}
               species={pond.fishBatches[0]?.species ?? "No fish"}
@@ -224,6 +270,7 @@ export default function PondsScreen() {
               unAssignedDevices={devices}
               onCreateFishBatch={handleCreateFishBatch}
               onAddDevice={handleAddDevice}
+              simulateReading={simulateReading}
               onPress={() =>
                 router.push({
                   pathname: "/ponds/[id]",

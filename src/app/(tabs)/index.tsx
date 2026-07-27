@@ -74,7 +74,7 @@ export default function DashboardScreen() {
         {!error && (
           <TouchableOpacity style={styles.createButton} onPress={() => router.push("/ponds/create")}>
             <Ionicons name="add" size={20} color={theme.colors.surface} />
-            <Text style={styles.createButtonText}>Create pond</Text>
+            <Text style={styles.createButtonText}>Setup pond</Text>
           </TouchableOpacity>
         )}
       </View>

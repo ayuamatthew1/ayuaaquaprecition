@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { theme } from "../../theme/theme";
 import AddDeviceModal from "./AddDeviceModal";
 import AddFishModal from "./AddFishModal";
@@ -8,6 +8,7 @@ import AddFishModal from "./AddFishModal";
 interface Device { id: string, name: string }
 interface Props {
   pondId: string;
+  deviceId?: string;
   name: string;
   species: string;
   fishCount: number;
@@ -16,6 +17,16 @@ interface Props {
   hasDevice: boolean;
   unAssignedDevices: Device[]
   onPress: () => void;
+  simulateReading: (sensors:
+    {
+      deviceId: string,
+      temperature: number,
+      ph: number,
+      dissolvedOxygen: number,
+      turbidity: number,
+      ammonia: number,
+    }
+  ) => void | Promise<void>
   onCreateFishBatch: (fishBatch: {
     pondId: string;
     species: string
@@ -29,6 +40,7 @@ interface Props {
 
 export default function PondCard({
   pondId,
+  deviceId,
   name,
   species,
   fishCount,
@@ -36,6 +48,7 @@ export default function PondCard({
   hasFish,
   hasDevice,
   unAssignedDevices,
+  simulateReading,
   onPress,
   onCreateFishBatch,
   onAddDevice,
@@ -43,6 +56,23 @@ export default function PondCard({
 
   const [showAddFishModal, setShowFishModal] = useState(false)
   const [showAddDeviceModal, setShowDeviceModal] = useState(false)
+
+  const handleSimulateReading = async () => {
+    if (!deviceId) {
+      Alert.alert("failed", "Device Id is required.");
+      return;
+    }
+    await simulateReading(
+      {
+        deviceId,
+        temperature: parseFloat((Math.random() * (40 - 18) + 18).toFixed(2)),
+        ph: parseFloat((Math.random() * (10 - 4) + 4).toFixed(2)),
+        dissolvedOxygen: parseFloat((Math.random() * (40 - 5) + 3).toFixed(2)),
+        turbidity: parseFloat((Math.random() * (30 - 5) + 5).toFixed(2)),
+        ammonia: parseFloat((Math.random() * (0.1 - 0.05) + 0.01).toFixed(2)),
+      }
+    )
+  }
   return (
     <View style={styles.card}>
       <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
@@ -81,6 +111,12 @@ export default function PondCard({
           <TouchableOpacity style={styles.actionButton} onPress={() => setShowDeviceModal(true)}>
             <Ionicons name="hardware-chip-outline" size={16} color={theme.colors.surface} />
             <Text style={styles.actionText}>Add Device</Text>
+          </TouchableOpacity>
+        )}
+        {(hasDevice && hasFish) && (
+          <TouchableOpacity style={styles.actionButton} onPress={handleSimulateReading}>
+            <Ionicons name="hardware-chip-outline" size={16} color={theme.colors.surface} />
+            <Text style={styles.actionText}>Simulate readings</Text>
           </TouchableOpacity>
         )}
       </View>
