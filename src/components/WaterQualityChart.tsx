@@ -46,7 +46,7 @@ export default function WaterQualityChart({
   return (
     <View
       style={{
-        backgroundColor: theme.colors.secondary,
+        backgroundColor: theme.colors.primary,
         borderRadius: 16,
         padding: 16,
         marginBottom: 20,
@@ -76,11 +76,11 @@ export default function WaterQualityChart({
         height={220}
         yAxisSuffix={unit}
         chartConfig={{
-          backgroundColor: theme.colors.secondary,
+          backgroundColor: theme.colors.primary,
           backgroundGradientFrom:
-            theme.colors.secondary,
+            theme.colors.primary,
           backgroundGradientTo:
-            theme.colors.secondary,
+            theme.colors.primary,
 
           decimalPlaces: 1,
 

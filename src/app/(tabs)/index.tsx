@@ -15,6 +15,7 @@ type DashboardReading = {
   deviceId: string;
   pondId: string;
   pondName: string;
+
   temperature: number;
   ph: number;
   dissolvedOxygen: number;
@@ -34,18 +35,29 @@ export default function DashboardScreen() {
   const [reading, setReading] = useState<DashboardReading | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPond, setSelectedPond] = useState('')
 
   const loadDashboard = useCallback(async () => {
     try {
       setError(null);
       const response = await authenticatedFetch("/api/dashboard");
-      const result: ApiResponse<DashboardReading | null> = await response.json();
+      const result = await response.json();
       console.log("Dashboard API response:", result);
       if (!response.ok || !result.success) {
         throw new Error(result.message ?? "Unable to load dashboard data.");
       }
+      const data = result.data
+      const latestReading = data.flatMap((pond: any) => {
+        const reading = pond.device?.sensorReadings[0];
+        return reading
+          ? [{ ...reading, deviceId: pond.device!.id, pondId: pond.id, pondName: pond.name }]
+          : [];
+      })
+      // .sort((a: any, b: any) => b.recordedAt.getTime() - a.recordedAt.getTime())[0];
+      console.log("Latest Reading: ", latestReading)
 
-      setReading(result.data);
+      setReading(latestReading[0]);
+
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard data.");
     } finally {
@@ -146,6 +158,21 @@ export default function DashboardScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.timestamp}>{data.timestamp.toDateString()}</Text>
+
+      {/* <View style={styles.typeGrid}>
+        {latestReading.map((pondType) => (
+          <TouchableOpacity
+            key={pondType}
+            onPress={() => setSel(pondType)}
+            style={[styles.typeButton, type === pondType && styles.typeButtonSelected]}
+          >
+            <Text style={[styles.typeText, SelectedPond === pondType && styles.typeTextSelected]}>
+              {pondType.charAt(0) + pondType.slice(1).toLowerCase()}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View> */}
+
       <WaterQualitySummary
         score={waterQuality.score}
         status={waterQuality.status}
@@ -238,7 +265,7 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 21,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-end",
   },
   timestamp: {
     fontSize: 14,
@@ -268,5 +295,30 @@ const styles = StyleSheet.create({
   gridItem: {
     width: "48%",
     marginBottom: 10,
+  },
+
+  typeGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 22,
+  },
+  typeButton: {
+    borderWidth: 1,
+    borderColor: theme.colors.surface,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  typeButtonSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  typeText: {
+    color: theme.colors.surface,
+    fontWeight: "600",
+  },
+  typeTextSelected: {
+    color: theme.colors.surface,
   },
 });

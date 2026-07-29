@@ -34,7 +34,7 @@ export default function AIRiskAnalysisCard({
         <Text style={styles.title}>
           AI Risk Analysis
         </Text>
-        <Link style={styles.linkContainer} href="/(tabs)/alert">
+        <Link style={styles.linkContainer} href="/alerts/alert">
           <Text style={styles.linkText}>View All</Text>
         </Link>
       </View>
@@ -43,7 +43,7 @@ export default function AIRiskAnalysisCard({
         style={[
           styles.riskLevel,
           { color: riskColor },
-        ]}  
+        ]}
       >
         {riskLevel} Risk
       </Text>
@@ -65,7 +65,7 @@ export default function AIRiskAnalysisCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.primary,
     borderRadius: 20,
     padding: 18,
     marginBottom: 20,

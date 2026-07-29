@@ -66,11 +66,11 @@ export default function WaterQualitySummary({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.primary,
     padding: 20,
     borderRadius: 20,
     marginVertical: 20,
-    // borderBottomStyle: 12, 'solid', 'white',
+    // borderBottomStyle: 12, 'solid' 'white',
   },
 
   header: {

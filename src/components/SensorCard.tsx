@@ -52,7 +52,9 @@ export default function SensorCard({
 
       <Text style={styles.value}>
         {value}
-        {unit ? ` ${unit}` : ""}
+        <Text style={styles.unit}>
+          {unit ? ` ${unit}` : ""}
+        </Text>
       </Text>
 
       <Text style={styles.ideal}>Ideal: {idealRange}</Text>
@@ -62,7 +64,7 @@ export default function SensorCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.primary,
     borderRadius: 16,
     padding: 14,
   },
@@ -78,6 +80,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700",
     marginTop: 6,
+  },
+  unit: {
+    color: theme.colors.surface,
+    fontSize: 12,
+    fontWeight: "700",
+    // marginTop: 6,
   },
 
   badge: {

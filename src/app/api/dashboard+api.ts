@@ -52,20 +52,13 @@ export async function GET(request: Request) {
       },
     });
 
-    const latestReading = ponds
-      .flatMap((pond) => {
-        const reading = pond.device?.sensorReadings[0];
-        return reading
-          ? [{ ...reading, deviceId: pond.device!.id, pondId: pond.id, pondName: pond.name }]
-          : [];
-      })
-      .sort((a, b) => b.recordedAt.getTime() - a.recordedAt.getTime())[0];
 
     return Response.json({
       success: true,
-      data: latestReading
-        ? { ...latestReading, recordedAt: latestReading.recordedAt.toISOString() }
-        : null,
+      data: ponds
+      // latestReading
+      //   ? { ...latestReading, recordedAt: latestReading.recordedAt.toISOString() }
+      //   : null,
     });
   } catch (error) {
     console.error("Dashboard data error:", error);

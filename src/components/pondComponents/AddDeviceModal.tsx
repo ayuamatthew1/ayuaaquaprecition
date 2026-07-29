@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
 
   saveBtn: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.background,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 10,
