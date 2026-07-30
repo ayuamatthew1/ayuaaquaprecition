@@ -1,4 +1,3 @@
-import { AlertSeverity, AlertStatus } from "@/prisma/generated/prisma/enums";
 import { AdminAlertList } from "@/src/components/adminComponents/AdminAlertList";
 import { AdminGate } from "@/src/components/adminComponents/AdminGate";
 import { useAuth } from "@/src/context/AuthContext";
@@ -19,8 +18,8 @@ export default function AdminAlertsScreen() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [severityFilter, setSeverityFilter] = useState<AlertSeverity | null>(null);
-  const [statusFilter, setStatusFilter] = useState<AlertStatus>("ACTIVE");
+  const [severityFilter, setSeverityFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ACTIVE");
 
   const fetchAlerts = async () => {
     try {
@@ -117,7 +116,7 @@ export default function AdminAlertsScreen() {
                 styles.severityFilter,
                 !severityFilter && styles.severityFilterActive,
               ]}
-              onPress={() => setSeverityFilter(null)}
+              onPress={() => setSeverityFilter('')}
             >
               <Text
                 style={[
@@ -135,7 +134,7 @@ export default function AdminAlertsScreen() {
                   styles.severityFilter,
                   severityFilter === severity && styles.severityFilterActive,
                 ]}
-                onPress={() => setSeverityFilter(severity as AlertSeverity)}
+                onPress={() => setSeverityFilter(severity)}
               >
                 <Text
                   style={[
@@ -158,7 +157,7 @@ export default function AdminAlertsScreen() {
                   styles.statusFilter,
                   statusFilter === status && styles.statusFilterActive,
                 ]}
-                onPress={() => setStatusFilter(status as AlertStatus)}
+                onPress={() => setStatusFilter(status)}
               >
                 <Text
                   style={[

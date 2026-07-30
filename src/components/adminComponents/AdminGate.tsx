@@ -1,4 +1,3 @@
-import { UserRole } from "@/prisma/generated/prisma/enums";
 import { useAuth } from "@/src/context/AuthContext";
 import { theme } from "@/src/theme/theme";
 import { useRouter } from "expo-router";
@@ -7,7 +6,7 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 interface AdminGateProps {
   children: React.ReactNode;
-  requiredRoles?: UserRole[];
+  requiredRoles?: string[];
   fallback?: React.ReactNode;
 }
 
@@ -19,7 +18,7 @@ interface AdminGateProps {
  */
 export const AdminGate: React.FC<AdminGateProps> = ({
   children,
-  requiredRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+  requiredRoles = ["SUPER_ADMIN", "ADMIN"],
   fallback,
 }) => {
   const router = useRouter();
@@ -60,7 +59,7 @@ export const AdminGate: React.FC<AdminGateProps> = ({
     );
   }
 
-  const hasAccess = requiredRoles.includes(user.role as UserRole);
+  const hasAccess = requiredRoles.includes(user.role);
 
   if (!hasAccess) {
     return (
@@ -88,7 +87,7 @@ export const AdminGate: React.FC<AdminGateProps> = ({
 /**
  * Hook to check if user has admin access
  */
-export const useAdminAccess = (requiredRoles: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.ADMIN]) => {
+export const useAdminAccess = (requiredRoles = ["SUPER_ADMIN", "ADMIN"]) => {
 
   const { user, isAuthenticated, loading } = useAuth();
 
@@ -100,7 +99,7 @@ export const useAdminAccess = (requiredRoles: UserRole[] = [UserRole.SUPER_ADMIN
     };
   }
 
-  const hasAccess = isAuthenticated && user && requiredRoles.includes(user.role as UserRole);
+  const hasAccess = isAuthenticated && user && requiredRoles.includes(user.role);
 
   return {
     hasAccess,
@@ -114,15 +113,15 @@ export const useAdminAccess = (requiredRoles: UserRole[] = [UserRole.SUPER_ADMIN
  */
 export const useIsAdmin = () => {
   const { user } = useAuth();
-  return user?.role === UserRole.ADMIN;
+  return user?.role === "ADMIN";
 };
 
 export const useIsSuperAdmin = () => {
   const { user } = useAuth();
-  return user?.role === UserRole.SUPER_ADMIN;
+  return user?.role === "SUPER_ADMIN";
 };
 
 export const useIsTechnician = () => {
   const { user } = useAuth();
-  return user?.role === UserRole.TECHNICIAN;
+  return user?.role === "TECHNICIAN";
 };

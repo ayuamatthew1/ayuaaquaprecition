@@ -1,4 +1,3 @@
-import { FarmStatus } from "@/prisma/generated/prisma/enums";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -18,7 +17,7 @@ interface Farm {
   description: string | null;
   address: string | null;
   city: string | null;
-  status: FarmStatus;
+  status: string;
   state: string | null;
   owner: {
     id: string;
@@ -51,7 +50,7 @@ export const AdminFarmList: React.FC<AdminFarmListProps> = ({
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const handleStatusChange = async (farm: Farm, newStatus: FarmStatus) => {
+  const handleStatusChange = async (farm: Farm, newStatus: string) => {
     if (!onUpdateFarm) return;
 
     setUpdatingId(farm.id);
@@ -62,7 +61,7 @@ export const AdminFarmList: React.FC<AdminFarmListProps> = ({
     }
   };
 
-  const getStatusColor = (status: FarmStatus) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
         return "#27ae60";
@@ -203,7 +202,7 @@ export const AdminFarmList: React.FC<AdminFarmListProps> = ({
                 <View style={styles.detailSection}>
                   <Text style={styles.detailLabel}>Status</Text>
                   <View style={styles.statusSelector}>
-                    {(["ACTIVE", "INACTIVE", "MAINTENANCE"] as FarmStatus[]).map((status) => (
+                    {(["ACTIVE", "INACTIVE", "MAINTENANCE"]).map((status) => (
                       <TouchableOpacity
                         key={status}
                         style={[

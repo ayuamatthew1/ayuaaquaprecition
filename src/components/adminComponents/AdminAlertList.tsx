@@ -1,4 +1,3 @@
-import { AlertSeverity, AlertStatus } from "@/prisma/generated/prisma/enums";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -16,8 +15,8 @@ interface Alert {
   id: string;
   title: string;
   message: string;
-  severity: AlertSeverity;
-  status: AlertStatus;
+  severity: string;
+  status: string;
   pond: {
     id: string;
     name: string;
@@ -86,7 +85,7 @@ export const AdminAlertList: React.FC<AdminAlertListProps> = ({
     }
   };
 
-  const getSeverityColor = (severity: AlertSeverity) => {
+  const getSeverityColor = (severity: any) => {
     switch (severity) {
       case "CRITICAL":
         return "#e74c3c";
@@ -101,7 +100,7 @@ export const AdminAlertList: React.FC<AdminAlertListProps> = ({
     }
   };
 
-  const getSeverityIcon = (severity: AlertSeverity) => {
+  const getSeverityIcon = (severity: any) => {
     switch (severity) {
       case "CRITICAL":
         return "alert-octagon";
@@ -116,7 +115,7 @@ export const AdminAlertList: React.FC<AdminAlertListProps> = ({
     }
   };
 
-  const getStatusIcon = (status: AlertStatus) => {
+  const getStatusIcon = (status: any) => {
     switch (status) {
       case "ACTIVE":
         return "clock";

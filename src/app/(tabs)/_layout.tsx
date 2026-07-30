@@ -1,4 +1,3 @@
-import { UserRole } from "@/prisma/generated/prisma/enums"
 import { useAuth } from "@/src/context/AuthContext"
 import { theme } from "@/src/theme/theme"
 import { Ionicons } from "@expo/vector-icons"
@@ -6,8 +5,9 @@ import { Tabs } from "expo-router"
 
 export default function TabsLayout() {
     const { user } = useAuth()
-    const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN
-    const isTechnician = user?.role === UserRole.TECHNICIAN
+    const isAdmin =
+        user?.role === "ADMIN" ||
+        user?.role === "SUPER_ADMIN";
 
     return (
         <Tabs

@@ -1,4 +1,3 @@
-import { UserRole } from "@/prisma/generated/prisma/enums";
 import { AdminUserList } from "@/src/components/adminComponents/AdminUserList";
 import { useAuth } from "@/src/context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,7 +19,7 @@ export default function AdminUsersScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState<UserRole | null>(null);
+  const [roleFilter, setRoleFilter] = useState('');
 
   const { authenticatedFetch } = useAuth()
 
@@ -125,7 +124,7 @@ export default function AdminUsersScreen() {
                 styles.roleFilter,
                 !roleFilter && styles.roleFilterActive,
               ]}
-              onPress={() => setRoleFilter(null)}
+              onPress={() => setRoleFilter('')}
             >
               <Text
                 style={[
@@ -136,7 +135,7 @@ export default function AdminUsersScreen() {
                 All
               </Text>
             </TouchableOpacity>
-            {Object.values(UserRole).map((role) => (
+            {["SUPER_ADMIN", "ADMIN", "TECHNICIAN", "FARMER"].map((role) => (
               <TouchableOpacity
                 key={role}
                 style={[

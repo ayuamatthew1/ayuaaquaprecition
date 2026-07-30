@@ -1,4 +1,3 @@
-import { UserRole, UserStatus } from "@/prisma/generated/prisma/enums";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -18,8 +17,8 @@ interface User {
   lastName: string;
   email: string;
   phone: string;
-  role: UserRole;
-  status: UserStatus;
+  role: string;
+  status: string;
   emailVerified: boolean;
   lastLoginAt: string | null;
   createdAt: string;
@@ -39,16 +38,16 @@ export const AdminUserList: React.FC<AdminUserListProps> = ({
   onDeleteUser,
 }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [editingRole, setEditingRole] = useState<UserRole | null>(null);
+  const [editingRole, setEditingRole] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const handleRoleChange = async (user: User, newRole: UserRole) => {
+  const handleRoleChange = async (user: User, newRole: string) => {
     if (!onUpdateUser) return;
 
     setUpdatingId(user.id);
     try {
       await onUpdateUser(user.id, { role: newRole });
-      setEditingRole(null);
+      setEditingRole('');
     } finally {
       setUpdatingId(null);
     }
@@ -66,22 +65,22 @@ export const AdminUserList: React.FC<AdminUserListProps> = ({
     }
   };
 
-  const getRoleBadgeColor = (role: UserRole) => {
+  const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case UserRole.SUPER_ADMIN:
+      case "SUPER_ADMIN":
         return "#e74c3c";
-      case UserRole.ADMIN:
+      case "ADMIN":
         return "#e67e22";
-      case UserRole.TECHNICIAN:
+      case "TECHNICIAN":
         return "#3498db";
-      case UserRole.FARMER:
+      case "FARMER":
         return "#27ae60";
       default:
         return "#95a5a6";
     }
   };
 
-  const getStatusBadgeColor = (status: UserStatus) => {
+  const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
         return "#27ae60";
@@ -186,7 +185,7 @@ export const AdminUserList: React.FC<AdminUserListProps> = ({
                   <Text style={styles.detailLabel}>Role</Text>
                   <TouchableOpacity
                     style={styles.roleSelector}
-                    onPress={() => setEditingRole(editingRole ? null : selectedUser.role)}
+                    onPress={() => setEditingRole(editingRole ? '' : selectedUser.role)}
                   >
                     <Text
                       style={[
@@ -205,7 +204,7 @@ export const AdminUserList: React.FC<AdminUserListProps> = ({
 
                   {editingRole === selectedUser.role && (
                     <View style={styles.roleOptions}>
-                      {Object.values(UserRole).map((role) => (
+                      {["SUPER_ADMIN", "ADMIN", "TECHNICIAN", "FARMER"].map((role) => (
                         <TouchableOpacity
                           key={role}
                           style={styles.roleOption}
